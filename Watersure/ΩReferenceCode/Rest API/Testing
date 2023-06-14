@@ -1,0 +1,6 @@
+curl -k 'GET' \
+  'https://eamcld01.water.local:443/axis/restservices/workorders/11083511%23VDP' \
+  -H 'accept: application/json' \
+  -H 'tenant: infor' \
+  -H 'organization: VDP' \
+  -H 'Authorization: Basic 'n

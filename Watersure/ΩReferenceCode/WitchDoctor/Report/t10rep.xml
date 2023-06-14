@@ -1,0 +1,2247 @@
+<report xmlns="http://developer.cognos.com/schemas/report/11.0/" expressionLocale="en"><!--RSU-SPC-0093 The report specification was upgraded from &quot;http://developer.cognos.com/schemas/report/10.0/&quot; to &quot;http://developer.cognos.com/schemas/report/11.0/&quot; at 2016-3-8. 9:37:47--><!--RSU-SPC-0093 The report specification was upgraded from &amp;amp;amp;amp;amp;amp;amp;amp;amp;quot;http://developer.cognos.com/schemas/report/8.0/&amp;amp;amp;amp;amp;amp;amp;amp;amp;quot; to &amp;amp;amp;amp;amp;amp;amp;amp;amp;quot;http://developer.cognos.com/schemas/report/10.0/&amp;amp;amp;amp;amp;amp;amp;amp;amp;quot; at 2014-10-2. 9:1:43--><!--RSU-SPC-0093 The report specification was upgraded from &amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;quot;http://developer.cognos.com/schemas/report/6.0/&amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;quot; to &amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;quot;http://developer.cognos.com/schemas/report/8.0/&amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;quot; at 2012-7-6. 13:9:28-->
+				<modelPath>/content/package[@name='InforEAMPackage_111']/model[@name='model']</modelPath>
+				<drillBehavior modelBasedDrillThru="true"/>
+				<queries>
+					<query name="problem code by cost">
+						<source>
+							
+						<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>select 
+  evt_reqm,
+  r5o7.o7get_desc('EN','RECO',evt_reqm, null,null) problemdesc, 
+  sum(round(nvl(mc_cost,0),0)) matcost,
+  sum(round(nvl(lc_cost,0),0)) labcost,
+  sum(round(nvl(mc_cost,0),0))+sum(round(nvl(lc_cost,0),0)) totcost
+from r5events inner join r5objects on obj_code = evt_object
+left outer join r5labcost on evt_code = lc_event
+left outer join r5matcost on evt_code = mc_event
+where  evt_rtype in ('PPM','JOB')
+and evt_jobtype != 'IS'
+and evt_status != 'REJ'
+and evt_reqm is not null
+and to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+group by evt_reqm</sqlText>
+		<mdProjectedItems><mdProjectedItem name="EVT_REQM"/><mdProjectedItem name="PROBLEMDESC"/><mdProjectedItem name="MATCOST"/><mdProjectedItem name="LABCOST"/><mdProjectedItem name="TOTCOST"/></mdProjectedItems></sqlQuery></source>
+						<selection><dataItem aggregate="total" label="Materials" name="Materials"><expression>[SQL1].[MATCOST]</expression></dataItem><dataItem aggregate="total" label="Labor" name="Labor"><expression>[SQL1].[LABCOST]</expression></dataItem><dataItem label="Problem Code" name="EVT_REQM"><expression>[SQL1].[EVT_REQM]</expression></dataItem><dataItem name="Data Item1"><expression>rank ([SQL1].[TOTCOST])</expression></dataItem><dataItem name="TOTCOST" sort="descending"><expression>[SQL1].[TOTCOST]</expression></dataItem></selection>
+					<detailFilters><detailFilter><filterExpression>[Data Item1] &lt;11</filterExpression></detailFilter></detailFilters></query>
+				<query name="problem code by count">
+						<source>
+							
+						<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>select 
+  evt_reqm,
+  r5o7.o7get_desc('EN','RECO',evt_reqm, null,null) problemdesc, 
+count(*) wocnt
+from r5events inner join r5objects on obj_code = evt_object
+left outer join r5labcost on evt_code = lc_event
+left outer join r5matcost on evt_code = mc_event
+where  evt_rtype in ('PPM','JOB')
+and evt_jobtype != 'IS'
+and evt_status != 'REJ'
+and evt_reqm is not null
+and to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+
+group by evt_reqm</sqlText>
+		<mdProjectedItems><mdProjectedItem name="EVT_REQM"/><mdProjectedItem name="PROBLEMDESC"/><mdProjectedItem name="WOCNT"/></mdProjectedItems></sqlQuery></source>
+						<selection><dataItem label="Problem Code" name="EVT_REQM"><expression>[SQL1].[EVT_REQM]</expression></dataItem><dataItem name="Data Item1"><expression>rank ([SQL1].[WOCNT])</expression></dataItem><dataItem label="WO Count" name="WOCNT" rollupAggregate="summarize"><expression>[SQL1].[WOCNT]</expression></dataItem></selection>
+					<detailFilters><detailFilter><filterExpression>[Data Item1] &lt;11</filterExpression></detailFilter></detailFilters></query><query name="equipment by cost">
+						<source>
+							
+						<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>select 
+  evt_object,
+obj_desc objectdesc, 
+  evt_object_org,
+  sum(round(nvl(mc_cost,0),0)) matcost,
+  sum(round(nvl(lc_cost,0),0))  - sum(round(nvl(cn_cost,0),0))  labcost,
+  sum(round(nvl(cn_cost,0),0)) contractcost,
+  sum(round(nvl(mc_cost,0),0))+sum(round(nvl(lc_cost,0),0)) totcost
+from r5events  inner join r5objects on obj_code = evt_object
+ left outer join r5labcost on evt_code = lc_event
+left outer join r5matcost on evt_code = mc_event
+left outer join 
+	(select evt_object cobj, sum(boo_cost) cn_cost from r5events
+	 inner join r5objects on obj_code = evt_object
+	inner join r5bookedhours 
+		on boo_event = evt_code
+	 inner join r5orderlines 
+		on boo_event = orl_event 
+		and boo_act = orl_act 
+		and orl_type like 'S%' 
+		and boo_person is null 
+	where to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+	and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+	and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+	and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+	group by evt_object) a on cobj = evt_object
+where  evt_rtype in ('PPM','JOB')
+and evt_jobtype != 'IS'
+and evt_status != 'REJ'
+and to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+group by evt_object, evt_object_org, obj_desc</sqlText>
+		<mdProjectedItems><mdProjectedItem name="EVT_OBJECT"/><mdProjectedItem name="OBJECTDESC"/><mdProjectedItem name="EVT_OBJECT_ORG"/><mdProjectedItem name="MATCOST"/><mdProjectedItem name="LABCOST"/><mdProjectedItem name="CONTRACTCOST"/><mdProjectedItem name="TOTCOST"/></mdProjectedItems></sqlQuery></source>
+						<selection><dataItem label="Equipment" name="EVT_OBJECT"><expression>[SQL1].[EVT_OBJECT]</expression></dataItem><dataItem label="Description" name="OBJECTDESC"><expression>[SQL1].[OBJECTDESC]</expression></dataItem><dataItem name="EVT_OBJECT_ORG"><expression>[SQL1].[EVT_OBJECT_ORG]</expression></dataItem><dataItem aggregate="total" label="Materials" name="Materials"><expression>[SQL1].[MATCOST]</expression></dataItem><dataItem aggregate="total" label="Int Labor" name="Labor"><expression>[SQL1].[LABCOST]</expression></dataItem><dataItem aggregate="total" label="Contractor" name="Contractor"><expression>[SQL1].[CONTRACTCOST]</expression></dataItem><dataItem label="Total" name="TOTCOST" sort="descending"><expression>[SQL1].[TOTCOST]</expression></dataItem><dataItem name="Data Item1"><expression>rank ([SQL1].[TOTCOST])</expression></dataItem></selection>
+					<detailFilters><detailFilter><filterExpression>[Data Item1] &lt;11</filterExpression></detailFilter></detailFilters></query><query name="equipment by matcost">
+						<source>
+							
+						<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>select 
+  evt_object,
+  obj_desc  objectdesc, 
+  evt_object_org,
+evt_jobtype,
+  sum(round(nvl(mc_cost,0),0)) matcost
+from r5events  inner join r5objects on obj_code = evt_object
+left outer join r5matcost on evt_code = mc_event
+where  evt_rtype in ('PPM','JOB')
+and evt_jobtype != 'IS'
+and evt_status != 'REJ'
+and to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+group by evt_object, evt_object_org,  obj_desc, evt_jobtype</sqlText>
+		<mdProjectedItems><mdProjectedItem name="EVT_OBJECT"/><mdProjectedItem name="OBJECTDESC"/><mdProjectedItem name="EVT_OBJECT_ORG"/><mdProjectedItem name="EVT_JOBTYPE"/><mdProjectedItem name="MATCOST"/></mdProjectedItems></sqlQuery></source>
+						<selection><dataItem label="Equipment" name="EVT_OBJECT"><expression>[SQL1].[EVT_OBJECT]</expression></dataItem><dataItem label="Description" name="OBJECTDESC"><expression>[SQL1].[OBJECTDESC]</expression></dataItem><dataItem name="EVT_OBJECT_ORG"><expression>[SQL1].[EVT_OBJECT_ORG]</expression></dataItem><dataItem aggregate="total" label="Materials" name="Materials"><expression>[SQL1].[MATCOST]</expression></dataItem><dataItem name="Data Item1"><expression>rank ([SQL1].[MATCOST])</expression></dataItem><dataItem label="WO Type" name="EVT_JOBTYPE"><expression>[SQL1].[EVT_JOBTYPE]</expression></dataItem></selection>
+					<detailFilters><detailFilter><filterExpression>[Data Item1] &lt;11</filterExpression></detailFilter></detailFilters></query><query name="equipment by labor">
+						<source>
+							
+						<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>select 
+  evt_object,
+ obj_desc objectdesc, 
+  evt_object_org,
+  sum(round(nvl(lc_cost,0),0))  - sum(round(nvl(cn_cost,0),0))  labcost,
+  sum(round(nvl(cn_cost,0),0)) contractcost,
+sum(round(nvl(lc_cost,0),0)) totcost
+from r5events  inner join r5objects on obj_code = evt_object
+ left outer join r5labcost on evt_code = lc_event
+left outer join 
+	(select evt_object cobj, sum(boo_cost) cn_cost from r5events
+	 inner join r5objects on obj_code = evt_object
+	inner join r5bookedhours 
+		on boo_event = evt_code
+	 inner join r5orderlines 
+		on boo_event = orl_event 
+		and boo_act = orl_act 
+		and orl_type like 'S%' 
+		and boo_person is null 
+	where to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+	and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+	and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+	and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+	group by evt_object) a on cobj = evt_object
+where  evt_rtype in ('PPM','JOB')
+and evt_jobtype != 'IS'
+and evt_status != 'REJ'
+and evt_object is not null
+and to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+group by evt_object, evt_object_org,  obj_desc</sqlText>
+		<mdProjectedItems><mdProjectedItem name="EVT_OBJECT"/><mdProjectedItem name="OBJECTDESC"/><mdProjectedItem name="EVT_OBJECT_ORG"/><mdProjectedItem name="LABCOST"/><mdProjectedItem name="CONTRACTCOST"/><mdProjectedItem name="TOTCOST"/></mdProjectedItems></sqlQuery></source>
+						<selection><dataItem label="Equipment" name="EVT_OBJECT"><expression>[SQL1].[EVT_OBJECT]</expression></dataItem><dataItem label="Description" name="OBJECTDESC"><expression>[SQL1].[OBJECTDESC]</expression></dataItem><dataItem name="EVT_OBJECT_ORG"><expression>[SQL1].[EVT_OBJECT_ORG]</expression></dataItem><dataItem aggregate="total" label="Int Labor" name="Labor"><expression>[SQL1].[LABCOST]</expression></dataItem><dataItem aggregate="total" label="Contractor" name="Contractor"><expression>[SQL1].[CONTRACTCOST]</expression></dataItem><dataItem label="Total" name="TOTCOST" sort="descending"><expression>[SQL1].[TOTCOST]</expression></dataItem><dataItem name="Data Item1"><expression>rank ([SQL1].[TOTCOST])</expression></dataItem></selection>
+					<detailFilters><detailFilter><filterExpression>[Data Item1] &lt;11</filterExpression></detailFilter></detailFilters></query><query name="equipment by internal labor">
+						<source>
+							
+						<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>select 
+  evt_object,
+  obj_desc  objectdesc, 
+  evt_object_org,
+evt_jobtype,
+  sum(round(nvl(lc_cost,0),0))  labcost
+
+from r5events  inner join r5objects on obj_code = evt_object
+ left outer join r5labcost on evt_code = lc_event
+where  evt_rtype in ('PPM','JOB')
+and evt_jobtype != 'IS'
+and evt_status != 'REJ'
+and to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+group by evt_object, evt_object_org,  obj_desc, evt_jobtype</sqlText>
+		<mdProjectedItems><mdProjectedItem name="EVT_OBJECT"/><mdProjectedItem name="OBJECTDESC"/><mdProjectedItem name="EVT_OBJECT_ORG"/><mdProjectedItem name="EVT_JOBTYPE"/><mdProjectedItem name="LABCOST"/></mdProjectedItems></sqlQuery></source>
+						<selection><dataItem label="Equipment" name="EVT_OBJECT"><expression>[SQL1].[EVT_OBJECT]</expression></dataItem><dataItem label="Description" name="OBJECTDESC"><expression>[SQL1].[OBJECTDESC]</expression></dataItem><dataItem name="EVT_OBJECT_ORG"><expression>[SQL1].[EVT_OBJECT_ORG]</expression></dataItem><dataItem aggregate="total" label="Labor" name="Labor"><expression>[SQL1].[LABCOST]</expression></dataItem><dataItem name="Data Item1"><expression>rank ([SQL1].[LABCOST])</expression></dataItem><dataItem label="WO Type" name="EVT_JOBTYPE"><expression>[SQL1].[EVT_JOBTYPE]</expression></dataItem></selection>
+					<detailFilters><detailFilter><filterExpression>[Data Item1] &lt;11</filterExpression></detailFilter></detailFilters></query><query name="equipment by contract labor">
+						<source>
+							
+						<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>select 
+  evt_object,
+  obj_desc objectdesc, 
+  evt_object_org,
+evt_jobtype,
+  sum(round(nvl(boo_cost,0),0))   contractcost
+from r5events  inner join r5objects on obj_code = evt_object
+	inner join r5bookedhours 
+		on boo_event = evt_code
+	 inner join r5orderlines 
+		on boo_event = orl_event 
+		and boo_act = orl_act 
+		and orl_type like 'S%' 
+		and boo_person is null 
+where  evt_rtype in ('PPM','JOB')
+and evt_jobtype != 'IS'
+and evt_status != 'REJ'
+and to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+group by evt_object, evt_object_org, obj_desc, evt_jobtype</sqlText>
+		<mdProjectedItems><mdProjectedItem name="EVT_OBJECT"/><mdProjectedItem name="OBJECTDESC"/><mdProjectedItem name="EVT_OBJECT_ORG"/><mdProjectedItem name="EVT_JOBTYPE"/><mdProjectedItem name="CONTRACTCOST"/></mdProjectedItems></sqlQuery></source>
+						<selection><dataItem label="Equipment" name="EVT_OBJECT"><expression>[SQL1].[EVT_OBJECT]</expression></dataItem><dataItem label="Description" name="OBJECTDESC"><expression>[SQL1].[OBJECTDESC]</expression></dataItem><dataItem name="EVT_OBJECT_ORG"><expression>[SQL1].[EVT_OBJECT_ORG]</expression></dataItem><dataItem name="Data Item1"><expression>rank ([SQL1].[CONTRACTCOST])</expression></dataItem><dataItem aggregate="total" label="Contractor Cost" name="CONTRACTCOST"><expression>[SQL1].[CONTRACTCOST]</expression></dataItem><dataItem label="WO Type" name="EVT_JOBTYPE"><expression>[SQL1].[EVT_JOBTYPE]</expression></dataItem></selection>
+					<detailFilters><detailFilter><filterExpression>[Data Item1] &lt;11</filterExpression></detailFilter></detailFilters></query><query name="equipment by wo count">
+						<source>
+							
+						<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>select 
+  evt_object,
+  obj_desc objectdesc, 
+  evt_object_org,
+evt_jobtype,
+count(*) wocnt   
+from r5events  inner join r5objects on obj_code = evt_object
+where  evt_rtype in ('PPM','JOB')
+and evt_jobtype != 'IS'
+and evt_status != 'REJ'
+and to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+group by evt_object, evt_object_org, obj_desc, evt_jobtype</sqlText>
+		<mdProjectedItems><mdProjectedItem name="EVT_OBJECT"/><mdProjectedItem name="OBJECTDESC"/><mdProjectedItem name="EVT_OBJECT_ORG"/><mdProjectedItem name="EVT_JOBTYPE"/><mdProjectedItem name="WOCNT"/></mdProjectedItems></sqlQuery></source>
+						<selection><dataItem label="Equipment" name="EVT_OBJECT"><expression>[SQL1].[EVT_OBJECT]</expression></dataItem><dataItem label="Description" name="OBJECTDESC"><expression>[SQL1].[OBJECTDESC]</expression></dataItem><dataItem name="EVT_OBJECT_ORG"><expression>[SQL1].[EVT_OBJECT_ORG]</expression></dataItem><dataItem name="Data Item1"><expression>rank ([WOCNT])</expression></dataItem><dataItem aggregate="total" label="Work Order Count" name="WOCNT"><expression>[SQL1].[WOCNT]</expression></dataItem><dataItem label="WO Type" name="EVT_JOBTYPE"><expression>[SQL1].[EVT_JOBTYPE]</expression></dataItem></selection>
+					<detailFilters><detailFilter><filterExpression>[Data Item1] &lt;11</filterExpression></detailFilter></detailFilters></query><query name="equipment risk ascessment">
+						<source>
+							
+						<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>select 
+  evt_object,
+  to_number(obj_criticality) obj_criticality,
+  obj_desc objectdesc, 
+  evt_object_org,
+count(*) wocnt   
+from r5events  inner join r5objects on obj_code = evt_object
+where  evt_rtype in ('PPM','JOB')
+and evt_jobtype != 'IS'
+and evt_status != 'REJ'
+and to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+group by evt_object, evt_object_org, obj_desc,  obj_criticality</sqlText>
+		<mdProjectedItems><mdProjectedItem name="EVT_OBJECT"/><mdProjectedItem name="OBJ_CRITICALITY"/><mdProjectedItem name="OBJECTDESC"/><mdProjectedItem name="EVT_OBJECT_ORG"/><mdProjectedItem name="WOCNT"/></mdProjectedItems></sqlQuery></source>
+						<selection><dataItem label="Equipment" name="EVT_OBJECT"><expression>[SQL1].[EVT_OBJECT]</expression></dataItem><dataItem label="Description" name="OBJECTDESC"><expression>[SQL1].[OBJECTDESC]</expression></dataItem><dataItem name="EVT_OBJECT_ORG"><expression>[SQL1].[EVT_OBJECT_ORG]</expression></dataItem><dataItem name="Data Item1"><expression>rank ([risk])</expression></dataItem><dataItem name="WOCNT"><expression>[SQL1].[WOCNT]</expression></dataItem><dataItem name="percentile"><expression>percentile ([WOCNT])</expression></dataItem><dataItem name="probability of failure"><expression>CASE 
+WHEN [percentile] between .9 and 1 THEN 5
+WHEN [percentile] between .6 and .899999 THEN 4
+WHEN [percentile] between .4 and .599999 THEN 3
+WHEN [percentile] between .2 and .399999 THEN 2
+ELSE 1
+END</expression></dataItem><dataItem name="OBJ_CRITICALITY"><expression>[SQL1].[OBJ_CRITICALITY]</expression></dataItem><dataItem aggregate="total" label="Risk Index Score " name="risk"><expression>[probability of failure] +  [OBJ_CRITICALITY] </expression></dataItem></selection>
+					<detailFilters><detailFilter><filterExpression>[Data Item1] &lt; 11</filterExpression></detailFilter></detailFilters></query><query name="labor over">
+			<source>
+				
+			<sqlQuery dataSource="AdvRepData" name="SQL3">
+			<sqlText>select per_code, per_desc, sum(hrs) - sum(act_est) hrsover
+from
+(
+select per_code,
+per_desc,
+hrs,
+act_est
+from
+r5events inner join r5objects on obj_code = evt_object
+inner join r5activities on act_event = evt_code
+inner join (select boo_event bevent, boo_act bact, boo_person, sum(boo_hours) hrs
+	from r5bookedhours 
+	where boo_person is not null 
+	group by boo_event, boo_act, boo_person  ) i on bevent = act_event and bact = act_act
+inner join r5personnel on per_code = boo_person
+where  evt_rtype in ('PPM','JOB')
+and evt_jobtype != 'IS'
+and evt_status != 'REJ'
+and to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+and hrs &gt; act_est
+and evt_jobtype &lt;&gt; 'MEC'
+
+union
+select orl_supplier,
+'Contractor: ' || orl_supplier,
+hrs,
+act_est
+from
+r5events inner join r5objects on obj_code = evt_object
+inner join r5activities on act_event = evt_code
+inner join (select boo_event bevent, boo_act bact, orl_supplier, sum(boo_hours) hrs
+	from r5bookedhours inner join r5orderlines on orl_event = boo_event and orl_act = boo_act
+	where boo_person is  null 
+	and orl_type like 'S%'
+	group by boo_event, boo_act, orl_supplier   ) s on bevent = act_event and bact = act_act
+where  evt_rtype in ('PPM','JOB')
+and evt_jobtype != 'IS'
+and evt_status != 'REJ'
+and to_char(evt_target, 'YYYY-MM-DD') between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( #prompt('SEL_ORG')# = '%' or evt_org = #prompt('SEL_ORG')# )
+and ( #prompt('SEL_MRC')# = '%' or evt_mrc = #prompt('SEL_MRC')# )
+and ( #prompt('SEL_CLASS')# = '%' or obj_class = #prompt('SEL_CLASS')# )
+and hrs &gt; act_est
+and evt_jobtype &lt;&gt; 'MEC'
+) l
+
+group by per_code, per_desc</sqlText>
+		<mdProjectedItems><mdProjectedItem name="PER_CODE"/><mdProjectedItem name="PER_DESC"/><mdProjectedItem name="HRSOVER"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="PER_CODE"><expression>[SQL3].[PER_CODE]</expression></dataItem><dataItem label="Employee" name="PER_DESC"><expression>[SQL3].[PER_DESC]</expression></dataItem><dataItem aggregate="total" label="Hours Exceeding Estimates" name="HRSOVER"><expression>[SQL3].[HRSOVER]</expression></dataItem><dataItem name="Data Item1"><expression>rank ([SQL3].[HRSOVER])</expression></dataItem></selection>
+		<detailFilters><detailFilter><filterExpression> [Data Item1] &lt; 11</filterExpression></detailFilter></detailFilters></query><query name="display Parameters">
+			<source>
+				
+			<sqlQuery dataSource="AdvRepData" name="SQL2">
+			<sqlText>select 
+rtrim(to_char( to_date(#prompt('SEL_START')#,'YYYY-MM-DD'), 'Day')) || ', '||    to_char( to_date(#prompt('SEL_START')#,'YYYY-MM-DD'), 'Mon DD, YYYY')  fromdate,
+rtrim(to_char( to_date(#prompt('SEL_END')#,'YYYY-MM-DD'), 'Day')) || ', '||    to_char( to_date(#prompt('SEL_END')#,'YYYY-MM-DD'), 'Mon DD, YYYY')  todate,
+case when #prompt('SEL_ORG')# = '%'  then 'All Organizations' else  #prompt('SEL_ORG')# end org,
+case when #prompt('SEL_MRC')# = '%'  then 'All Departments' 
+else  r5rep.repgetdesc('EN','MRC', #prompt('SEL_MRC')#, null,null)  end mrc,
+case when #prompt('SEL_CLASS')# = '%'  then 'All Calsses' 
+else  r5rep.repgetdesc('EN','CLAS', #prompt('SEL_CLASS')#, 'OBJ',null)  end eclass
+from dual
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="FROMDATE"/><mdProjectedItem name="TODATE"/><mdProjectedItem name="ORG"/><mdProjectedItem name="MRC"/><mdProjectedItem name="ECLASS"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="FROMDATE"><expression>[SQL2].[FROMDATE]</expression></dataItem><dataItem name="TODATE"><expression>[SQL2].[TODATE]</expression></dataItem><dataItem name="D7ILOGO"><expression>#sq($INSTALLPARAMETERS{'EAMRLOGO'})#</expression></dataItem><dataItem name="CMPLOGO"><expression>#sq($INSTALLPARAMETERS{'CMPRLOGO'})#</expression></dataItem><dataItem name="ORG"><expression>[SQL2].[ORG]</expression></dataItem><dataItem name="MRC"><expression>[SQL2].[MRC]</expression></dataItem><dataItem name="ECLASS"><expression>[SQL2].[ECLASS]</expression></dataItem></selection>
+		</query></queries>
+				<layouts>
+					<layout>
+						<reportPages>
+							<page name="Page1" refQuery="display Parameters"><style><defaultStyles><defaultStyle refStyle="pg"/></defaultStyles></style>
+								<pageBody><style><defaultStyles><defaultStyle refStyle="pb"/></defaultStyles></style>
+									<contents>
+										
+									<table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><v2_combinationChart depth="75" maxHotspots="10000" name="Combination Chart1" refQuery="problem code by cost">
+														<v2_combinationTypeTooltips/>
+														<v2_commonAxis>
+															<v2_ordinalAxis>
+																<v2_axisTitle refQuery="problem code by cost">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+															</v2_ordinalAxis>
+															<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_REQM"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="TOTCOST" sortOrder="descending"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_commonAxis>
+														<v2_topLeftAxis>
+															<v2_combinationChartTypes>
+																<v2_bar barShape="cylinder" seriesType="stacked">
+																	<!-- v2_solidPaletteRef ref=&amp;amp;amp;quot;gDefaultSolid&amp;amp;amp;quot;/ -->
+																	<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Materials"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode><chartNode><chartNodeMembers><chartNodeMember refDataItem="Labor"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes><v2_solidPalette>
+																		<v2_solidPaletteEntries>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#333399"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC9933"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#993333"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CCCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#336633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6699CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF0033"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF6633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC0099"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#66CC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#0033FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6666FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#9900FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#339966"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FFCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6633CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#999999"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																		</v2_solidPaletteEntries>
+																	</v2_solidPalette>
+																</v2_bar>
+															</v2_combinationChartTypes>
+															<v2_axis>
+																<v2_axisTitle refQuery="problem code by cost">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisRange>
+																	<v2_automaticRange/>
+																</v2_axisRange>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+																<v2_majorGridlines lineColor="#cccccc" lineWeight="0pt"/>
+															</v2_axis>
+														</v2_topLeftAxis>
+														<style>
+															<CSS value="margin-top:0.25in;width:7in;height:3.5in"/><defaultStyles><defaultStyle refStyle="ch"/></defaultStyles></style>
+														<noDataHandler>
+															<contents>
+																<block>
+																	<contents>
+																		<textItem>
+																			<dataSource>
+																				<staticValue>No Data Available</staticValue>
+																			</dataSource>
+																			<style>
+																				<CSS value="padding:10px 18px;"/>
+																			</style>
+																		</textItem>
+																	</contents>
+																</block>
+															</contents>
+														</noDataHandler>
+														<v2_legend><v2_legendPosition><v2_legendPreset/></v2_legendPosition><v2_legendTitle refQuery="problem code by cost"><v2_chartTextContents><v2_automaticText/></v2_chartTextContents><style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style></v2_legendTitle><style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style></v2_legend><v2_chartTitle refQuery="problem code by cost"><style><defaultStyles><defaultStyle refStyle="ct"/></defaultStyles><CSS value="font-size:12pt"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Top 10 Problem Codes</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartTitle><v2_chartSubTitle refQuery="problem code by cost"><style><defaultStyles><defaultStyle refStyle="cs"/></defaultStyles><CSS value="font-size:10pt;font-weight:normal"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>By Work Order Cost</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartSubTitle><conditionalRender refVariable="PROB_COST"><renderFor refVariableValue="1"/></conditionalRender></v2_combinationChart>
+												</contents><style><CSS value="text-align:left;font-weight:bold;text-decoration:none;height:50px"/></style></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><v2_combinationChart depth="75" maxHotspots="10000" name="Combination Chart2" refQuery="problem code by count">
+														<v2_combinationTypeTooltips/>
+														<v2_commonAxis>
+															<v2_ordinalAxis>
+																<v2_axisTitle refQuery="problem code by count">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+															</v2_ordinalAxis>
+															<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_REQM"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_commonAxis>
+														<v2_topLeftAxis>
+															<v2_combinationChartTypes>
+																<v2_bar barShape="cylinder" seriesType="stacked">
+																	<!-- v2_solidPaletteRef ref=&amp;amp;amp;quot;gDefaultSolid&amp;amp;amp;quot;/ -->
+																	<v2_solidPalette>
+																		<v2_solidPaletteEntries>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#333399"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC9933"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#993333"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CCCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#336633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6699CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF0033"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF6633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC0099"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#66CC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#0033FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6666FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#9900FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#339966"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FFCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6633CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#999999"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																		</v2_solidPaletteEntries>
+																	</v2_solidPalette>
+																</v2_bar>
+															</v2_combinationChartTypes>
+															<v2_axis>
+																<v2_axisTitle refQuery="problem code by count">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisRange>
+																	<v2_automaticRange/>
+																</v2_axisRange>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+																<v2_majorGridlines lineColor="#cccccc" lineWeight="0pt"/>
+															</v2_axis>
+														</v2_topLeftAxis>
+														<style>
+															<CSS value="margin-top:0.25in;width:7in;height:3.5in"/><defaultStyles><defaultStyle refStyle="ch"/></defaultStyles></style>
+														<noDataHandler>
+															<contents>
+																<block>
+																	<contents>
+																		<textItem>
+																			<dataSource>
+																				<staticValue>No Data Available</staticValue>
+																			</dataSource>
+																			<style>
+																				<CSS value="padding:10px 18px;"/>
+																			</style>
+																		</textItem>
+																	</contents>
+																</block>
+															</contents>
+														</noDataHandler>
+														<v2_defaultChartMeasure refDataItem="WOCNT"/><v2_legend><v2_legendPosition><v2_legendPreset/></v2_legendPosition><v2_legendTitle refQuery="problem code by count"><v2_chartTextContents><v2_automaticText/></v2_chartTextContents><style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style></v2_legendTitle><style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style></v2_legend><v2_chartTitle refQuery="problem code by count"><style><defaultStyles><defaultStyle refStyle="ct"/></defaultStyles><CSS value="font-size:12pt"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Top 10 Problem Codes</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartTitle><v2_chartSubTitle refQuery="problem code by count"><style><defaultStyles><defaultStyle refStyle="cs"/></defaultStyles><CSS value="font-size:10pt;font-weight:normal"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>By Work Order Count</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartSubTitle><conditionalRender refVariable="PROB_COUNT"><renderFor refVariableValue="1"/></conditionalRender></v2_combinationChart>
+												</contents><style><CSS value="text-align:left"/></style></tableCell><tableCell><contents/><style><CSS value="vertical-align:top"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><v2_combinationChart depth="75" maxHotspots="10000" name="Combination Chart3" refQuery="equipment by cost">
+														<v2_combinationTypeTooltips/>
+														<v2_commonAxis>
+															<v2_ordinalAxis>
+																<v2_axisTitle refQuery="equipment by cost">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+															</v2_ordinalAxis>
+															<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_OBJECT"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="TOTCOST" sortOrder="descending"/></sortList><propertyList><propertyItem refDataItem="TOTCOST"/></propertyList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_commonAxis>
+														<v2_topLeftAxis>
+															<v2_combinationChartTypes>
+																<v2_bar barShape="cylinder" seriesType="stacked">
+																	<!-- v2_solidPaletteRef ref=&amp;amp;amp;quot;gDefaultSolid&amp;amp;amp;quot;/ -->
+																	<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Materials"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode><chartNode><chartNodeMembers><chartNodeMember refDataItem="Labor"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode><chartNode><chartNodeMembers><chartNodeMember refDataItem="Contractor"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes><v2_solidPalette>
+																		<v2_solidPaletteEntries>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#333399"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC9933"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#993333"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CCCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#336633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6699CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF0033"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF6633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC0099"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#66CC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#0033FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6666FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#9900FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#339966"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FFCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6633CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#999999"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																		</v2_solidPaletteEntries>
+																	</v2_solidPalette>
+																</v2_bar>
+															</v2_combinationChartTypes>
+															<v2_axis>
+																<v2_axisTitle refQuery="equipment by cost">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisRange>
+																	<v2_automaticRange/>
+																</v2_axisRange>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+																<v2_majorGridlines lineColor="#cccccc" lineWeight="0pt"/>
+															</v2_axis>
+														</v2_topLeftAxis>
+														<style>
+															<CSS value="margin-top:0.25in;width:7in;height:3.5in"/><defaultStyles><defaultStyle refStyle="ch"/></defaultStyles></style>
+														<noDataHandler>
+															<contents>
+																<block>
+																	<contents>
+																		<textItem>
+																			<dataSource>
+																				<staticValue>No Data Available</staticValue>
+																			</dataSource>
+																			<style>
+																				<CSS value="padding:10px 18px;"/>
+																			</style>
+																		</textItem>
+																	</contents>
+																</block>
+															</contents>
+														</noDataHandler>
+														<v2_legend><v2_legendPosition><v2_legendPreset/></v2_legendPosition><v2_legendTitle refQuery="equipment by cost"><v2_chartTextContents><v2_automaticText/></v2_chartTextContents><style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style></v2_legendTitle><style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style></v2_legend><v2_chartTitle refQuery="equipment by cost"><style><defaultStyles><defaultStyle refStyle="ct"/></defaultStyles><CSS value="font-size:12pt"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Top 10 Equipment</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartTitle><v2_chartSubTitle refQuery="equipment by cost"><style><defaultStyles><defaultStyle refStyle="cs"/></defaultStyles><CSS value="font-size:10pt;font-weight:normal"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>By Total Work Order Cost</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartSubTitle><conditionalRender refVariable="EQUIP_COST"><renderFor refVariableValue="1"/></conditionalRender></v2_combinationChart>
+												</contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><v2_combinationChart depth="75" maxHotspots="10000" name="Combination Chart4" refQuery="equipment by matcost">
+														<v2_combinationTypeTooltips/>
+														<v2_commonAxis>
+															<v2_ordinalAxis>
+																<v2_axisTitle refQuery="equipment by matcost">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+															</v2_ordinalAxis>
+															<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_OBJECT"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="Materials" sortOrder="descending"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_commonAxis>
+														<v2_topLeftAxis>
+															<v2_combinationChartTypes>
+																<v2_bar barShape="cylinder" seriesType="stacked">
+																	<!-- v2_solidPaletteRef ref=&amp;amp;amp;quot;gDefaultSolid&amp;amp;amp;quot;/ -->
+																	<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_JOBTYPE"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes><v2_solidPalette>
+																		<v2_solidPaletteEntries>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#333399"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC9933"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#993333"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CCCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#336633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6699CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF0033"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF6633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC0099"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#66CC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#0033FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6666FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#9900FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#339966"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FFCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6633CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#999999"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																		</v2_solidPaletteEntries>
+																	</v2_solidPalette>
+																</v2_bar>
+															</v2_combinationChartTypes>
+															<v2_axis>
+																<v2_axisTitle refQuery="equipment by matcost">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisRange>
+																	<v2_automaticRange/>
+																</v2_axisRange>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+																<v2_majorGridlines lineColor="#cccccc" lineWeight="0pt"/>
+															</v2_axis>
+														</v2_topLeftAxis>
+														<style>
+															<CSS value="margin-top:0.25in;width:7in;height:3.5in"/><defaultStyles><defaultStyle refStyle="ch"/></defaultStyles></style>
+														<noDataHandler>
+															<contents>
+																<block>
+																	<contents>
+																		<textItem>
+																			<dataSource>
+																				<staticValue>No Data Available</staticValue>
+																			</dataSource>
+																			<style>
+																				<CSS value="padding:10px 18px;"/>
+																			</style>
+																		</textItem>
+																	</contents>
+																</block>
+															</contents>
+														</noDataHandler>
+														<v2_defaultChartMeasure refDataItem="Materials"/><v2_legend><v2_legendPosition><v2_legendPreset/></v2_legendPosition><v2_legendTitle refQuery="equipment by matcost"><v2_chartTextContents><v2_automaticText/></v2_chartTextContents><style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style></v2_legendTitle><style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style></v2_legend><v2_chartTitle refQuery="equipment by matcost"><style><defaultStyles><defaultStyle refStyle="ct"/></defaultStyles><CSS value="font-size:12pt"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Top 10 Equipment</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartTitle><v2_chartSubTitle refQuery="equipment by matcost"><style><defaultStyles><defaultStyle refStyle="cs"/></defaultStyles><CSS value="font-size:10pt;font-weight:normal"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>By Material Cost and WO Type</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartSubTitle><conditionalRender refVariable="EQUIP_MATCOST"><renderFor refVariableValue="1"/></conditionalRender></v2_combinationChart>
+												</contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><v2_combinationChart depth="75" maxHotspots="10000" name="Combination Chart5" refQuery="equipment by labor">
+														<v2_combinationTypeTooltips/>
+														<v2_commonAxis>
+															<v2_ordinalAxis>
+																<v2_axisTitle refQuery="equipment by labor">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+															</v2_ordinalAxis>
+															<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_OBJECT"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="TOTCOST" sortOrder="descending"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_commonAxis>
+														<v2_topLeftAxis>
+															<v2_combinationChartTypes>
+																<v2_bar barShape="cylinder" seriesType="stacked">
+																	<!-- v2_solidPaletteRef ref=&amp;amp;amp;quot;gDefaultSolid&amp;amp;amp;quot;/ -->
+																	<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Labor"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode><chartNode><chartNodeMembers><chartNodeMember refDataItem="Contractor"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes><v2_solidPalette>
+																		<v2_solidPaletteEntries>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#333399"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC9933"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#993333"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CCCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#336633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6699CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF0033"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF6633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC0099"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#66CC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#0033FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6666FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#9900FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#339966"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FFCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6633CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#999999"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																		</v2_solidPaletteEntries>
+																	</v2_solidPalette>
+																</v2_bar>
+															</v2_combinationChartTypes>
+															<v2_axis>
+																<v2_axisTitle refQuery="equipment by labor">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisRange>
+																	<v2_automaticRange/>
+																</v2_axisRange>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+																<v2_majorGridlines lineColor="#cccccc" lineWeight="0pt"/>
+															</v2_axis>
+														</v2_topLeftAxis>
+														<style>
+															<CSS value="margin-top:0.25in;width:7in;height:3.5in"/><defaultStyles><defaultStyle refStyle="ch"/></defaultStyles></style>
+														<noDataHandler>
+															<contents>
+																<block>
+																	<contents>
+																		<textItem>
+																			<dataSource>
+																				<staticValue>No Data Available</staticValue>
+																			</dataSource>
+																			<style>
+																				<CSS value="padding:10px 18px;"/>
+																			</style>
+																		</textItem>
+																	</contents>
+																</block>
+															</contents>
+														</noDataHandler>
+														<v2_legend><v2_legendPosition><v2_legendPreset/></v2_legendPosition><v2_legendTitle refQuery="equipment by labor"><v2_chartTextContents><v2_automaticText/></v2_chartTextContents><style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style></v2_legendTitle><style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style></v2_legend><v2_chartTitle refQuery="equipment by labor"><style><defaultStyles><defaultStyle refStyle="ct"/></defaultStyles><CSS value="font-size:12pt"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Top 10 Equipment</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartTitle><v2_chartSubTitle refQuery="equipment by labor"><style><defaultStyles><defaultStyle refStyle="cs"/></defaultStyles><CSS value="font-size:10pt;font-weight:normal"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>By Total Labor Cost</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartSubTitle><conditionalRender refVariable="EQUIP_LABOR"><renderFor refVariableValue="1"/></conditionalRender></v2_combinationChart>
+												</contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><v2_combinationChart depth="75" maxHotspots="10000" name="Combination Chart6" refQuery="equipment by internal labor">
+														<v2_combinationTypeTooltips/>
+														<v2_commonAxis>
+															<v2_ordinalAxis manualTruncationMaxChars="8">
+																<v2_axisTitle refQuery="equipment by internal labor">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+															</v2_ordinalAxis>
+															<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_OBJECT"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="Labor" sortOrder="descending"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_commonAxis>
+														<v2_topLeftAxis>
+															<v2_combinationChartTypes>
+																<v2_bar barShape="cylinder" seriesType="stacked">
+																	<!-- v2_solidPaletteRef ref=&amp;amp;amp;quot;gDefaultSolid&amp;amp;amp;quot;/ -->
+																	<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_JOBTYPE"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes><v2_solidPalette>
+																		<v2_solidPaletteEntries>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#333399"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC9933"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#993333"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CCCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#336633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6699CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF0033"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF6633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC0099"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#66CC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#0033FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6666FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#9900FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#339966"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FFCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6633CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#999999"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																		</v2_solidPaletteEntries>
+																	</v2_solidPalette>
+																</v2_bar>
+															</v2_combinationChartTypes>
+															<v2_axis>
+																<v2_axisTitle refQuery="equipment by internal labor">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisRange>
+																	<v2_automaticRange/>
+																</v2_axisRange>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+																<v2_majorGridlines lineColor="#cccccc" lineWeight="0pt"/>
+															</v2_axis>
+														</v2_topLeftAxis>
+														<style>
+															<CSS value="margin-top:0.25in;width:7in;height:3.5in"/><defaultStyles><defaultStyle refStyle="ch"/></defaultStyles></style>
+														<noDataHandler>
+															<contents>
+																<block>
+																	<contents>
+																		<textItem>
+																			<dataSource>
+																				<staticValue>No Data Available</staticValue>
+																			</dataSource>
+																			<style>
+																				<CSS value="padding:10px 18px;"/>
+																			</style>
+																		</textItem>
+																	</contents>
+																</block>
+															</contents>
+														</noDataHandler>
+														<v2_defaultChartMeasure refDataItem="Labor"/><v2_legend><v2_legendPosition><v2_legendPreset/></v2_legendPosition><v2_legendTitle refQuery="equipment by internal labor"><v2_chartTextContents><v2_automaticText/></v2_chartTextContents><style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style></v2_legendTitle><style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style></v2_legend><v2_chartTitle refQuery="equipment by internal labor"><style><defaultStyles><defaultStyle refStyle="ct"/></defaultStyles><CSS value="font-size:12pt"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Top 10 Equipment</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartTitle><v2_chartSubTitle refQuery="equipment by internal labor"><style><defaultStyles><defaultStyle refStyle="cs"/></defaultStyles><CSS value="font-size:10pt;font-weight:normal"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>By Internal Labor and Work Order Type</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartSubTitle><conditionalRender refVariable="EQUIP_INTLABOR"><renderFor refVariableValue="1"/></conditionalRender></v2_combinationChart>
+												</contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><v2_combinationChart depth="75" maxHotspots="10000" name="Combination Chart7" refQuery="equipment by contract labor">
+														<v2_combinationTypeTooltips/>
+														<v2_commonAxis>
+															<v2_ordinalAxis manualTruncationMaxChars="8">
+																<v2_axisTitle refQuery="equipment by contract labor">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+															</v2_ordinalAxis>
+															<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_OBJECT"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="CONTRACTCOST"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_commonAxis>
+														<v2_topLeftAxis>
+															<v2_combinationChartTypes>
+																<v2_bar barShape="cylinder" seriesType="stacked">
+																	<!-- v2_solidPaletteRef ref=&amp;amp;amp;quot;gDefaultSolid&amp;amp;amp;quot;/ -->
+																	<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_JOBTYPE"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes><v2_solidPalette>
+																		<v2_solidPaletteEntries>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#333399"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC9933"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#993333"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CCCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#336633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6699CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF0033"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF6633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC0099"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#66CC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#0033FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6666FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#9900FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#339966"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FFCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6633CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#999999"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																		</v2_solidPaletteEntries>
+																	</v2_solidPalette>
+																</v2_bar>
+															</v2_combinationChartTypes>
+															<v2_axis>
+																<v2_axisTitle refQuery="equipment by contract labor">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisRange>
+																	<v2_automaticRange/>
+																</v2_axisRange>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+																<v2_majorGridlines lineColor="#cccccc" lineWeight="0pt"/>
+															</v2_axis>
+														</v2_topLeftAxis>
+														<style>
+															<CSS value="margin-top:0.25in;width:7in;height:3.5in"/><defaultStyles><defaultStyle refStyle="ch"/></defaultStyles></style>
+														<noDataHandler>
+															<contents>
+																<block>
+																	<contents>
+																		<textItem>
+																			<dataSource>
+																				<staticValue>No Data Available</staticValue>
+																			</dataSource>
+																			<style>
+																				<CSS value="padding:10px 18px;"/>
+																			</style>
+																		</textItem>
+																	</contents>
+																</block>
+															</contents>
+														</noDataHandler>
+														<v2_defaultChartMeasure refDataItem="CONTRACTCOST"/><v2_legend><v2_legendPosition><v2_legendPreset/></v2_legendPosition><v2_legendTitle refQuery="equipment by contract labor"><v2_chartTextContents><v2_automaticText/></v2_chartTextContents><style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style></v2_legendTitle><style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style></v2_legend><v2_chartTitle refQuery="equipment by contract labor"><style><defaultStyles><defaultStyle refStyle="ct"/></defaultStyles><CSS value="font-size:12pt"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Top 10 Equipment</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartTitle><v2_chartSubTitle refQuery="equipment by contract labor"><style><defaultStyles><defaultStyle refStyle="cs"/></defaultStyles><CSS value="font-size:10pt;font-weight:normal"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>By Contractor Labor and Work Order Type</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartSubTitle><reportDrills><reportDrill name="Drill-Through Definition1"><drillLabel><dataSource><staticValue/></dataSource></drillLabel><drillTarget><reportPath path="/content/folder[@name='RM01']/report[@name='Top10Problems']"><XMLAttributes><XMLAttribute name="ReportName" output="no" value="Top10Problems"/><XMLAttribute name="class" output="no" value="report"/></XMLAttributes></reportPath><drillLinks><drillLink><drillTargetContext><parameterContext parameter="SelectedObject"/></drillTargetContext><drillSourceContext><dataItemContext refDataItem="EVT_REQM"/></drillSourceContext></drillLink></drillLinks></drillTarget></reportDrill></reportDrills><conditionalRender refVariable="EQUIP_CONTLABOR"><renderFor refVariableValue="1"/></conditionalRender></v2_combinationChart>
+												</contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><v2_combinationChart depth="75" maxHotspots="10000" name="Combination Chart8" refQuery="equipment by wo count">
+														<v2_combinationTypeTooltips/>
+														<v2_commonAxis>
+															<v2_ordinalAxis>
+																<v2_axisTitle refQuery="equipment by wo count">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+															</v2_ordinalAxis>
+															<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_OBJECT"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="WOCNT" sortOrder="descending"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_commonAxis>
+														<v2_topLeftAxis>
+															<v2_combinationChartTypes>
+																<v2_bar barShape="cylinder" seriesType="stacked">
+																	<!-- v2_solidPaletteRef ref=&amp;amp;amp;quot;gDefaultSolid&amp;amp;amp;quot;/ -->
+																	<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_JOBTYPE"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes><v2_solidPalette>
+																		<v2_solidPaletteEntries>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#333399"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC9933"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#993333"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CCCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#336633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6699CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF0033"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF6633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC0099"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#66CC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#0033FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6666FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#9900FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#339966"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FFCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6633CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#999999"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																		</v2_solidPaletteEntries>
+																	</v2_solidPalette>
+																</v2_bar>
+															</v2_combinationChartTypes>
+															<v2_axis>
+																<v2_axisTitle refQuery="equipment by wo count">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisRange>
+																	<v2_automaticRange/>
+																</v2_axisRange>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+																<v2_majorGridlines lineColor="#cccccc" lineWeight="0pt"/>
+															</v2_axis>
+														</v2_topLeftAxis>
+														<style>
+															<CSS value="margin-top:0.25in;width:7in;height:3.5in"/><defaultStyles><defaultStyle refStyle="ch"/></defaultStyles></style>
+														<noDataHandler>
+															<contents>
+																<block>
+																	<contents>
+																		<textItem>
+																			<dataSource>
+																				<staticValue>No Data Available</staticValue>
+																			</dataSource>
+																			<style>
+																				<CSS value="padding:10px 18px;"/>
+																			</style>
+																		</textItem>
+																	</contents>
+																</block>
+															</contents>
+														</noDataHandler>
+														<v2_defaultChartMeasure refDataItem="WOCNT"/><v2_legend><v2_legendPosition><v2_legendPreset/></v2_legendPosition><v2_legendTitle refQuery="equipment by wo count"><v2_chartTextContents><v2_automaticText/></v2_chartTextContents><style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style></v2_legendTitle><style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style></v2_legend><v2_chartTitle refQuery="equipment by wo count"><style><defaultStyles><defaultStyle refStyle="ct"/></defaultStyles><CSS value="font-size:12pt"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Top 10 Equipment</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartTitle><v2_chartSubTitle refQuery="equipment by wo count"><style><defaultStyles><defaultStyle refStyle="cs"/></defaultStyles><CSS value="font-size:10pt;font-weight:normal"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>By Work Order Count and Work Order Type</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartSubTitle><conditionalRender refVariable="EQUIP_WOCOUNT"><renderFor refVariableValue="1"/></conditionalRender></v2_combinationChart>
+												</contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><v2_combinationChart depth="75" maxHotspots="10000" name="Combination Chart9" refQuery="equipment risk ascessment">
+														<v2_combinationTypeTooltips/>
+														<v2_commonAxis>
+															<v2_ordinalAxis>
+																<v2_axisTitle refQuery="equipment risk ascessment">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+															</v2_ordinalAxis>
+															<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="EVT_OBJECT"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="risk" sortOrder="descending"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_commonAxis>
+														<v2_topLeftAxis>
+															<v2_combinationChartTypes>
+																<v2_bar barShape="cylinder" seriesType="stacked">
+																	<!-- v2_solidPaletteRef ref=&amp;amp;amp;quot;gDefaultSolid&amp;amp;amp;quot;/ -->
+																	<v2_solidPalette>
+																		<v2_solidPaletteEntries>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#333399"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC9933"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#993333"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CCCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#336633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6699CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF0033"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF6633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC0099"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#66CC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#0033FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6666FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#9900FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#339966"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FFCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6633CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#999999"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																		</v2_solidPaletteEntries>
+																	</v2_solidPalette>
+																</v2_bar>
+															</v2_combinationChartTypes>
+															<v2_axis>
+																<v2_axisTitle refQuery="equipment risk ascessment">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisRange>
+																	<v2_automaticRange/>
+																</v2_axisRange>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+																<v2_majorGridlines lineColor="#cccccc" lineWeight="0pt"/>
+															</v2_axis>
+														</v2_topLeftAxis>
+														<style>
+															<CSS value="margin-top:0.25in;width:7in;height:3.5in"/><defaultStyles><defaultStyle refStyle="ch"/></defaultStyles></style>
+														<noDataHandler>
+															<contents>
+																<block>
+																	<contents>
+																		<textItem>
+																			<dataSource>
+																				<staticValue>No Data Available</staticValue>
+																			</dataSource>
+																			<style>
+																				<CSS value="padding:10px 18px;"/>
+																			</style>
+																		</textItem>
+																	</contents>
+																</block>
+															</contents>
+														</noDataHandler>
+														<v2_defaultChartMeasure refDataItem="risk"/><v2_legend><v2_legendPosition><v2_legendPreset/></v2_legendPosition><v2_legendTitle refQuery="equipment risk ascessment"><v2_chartTextContents><v2_automaticText/></v2_chartTextContents><style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style></v2_legendTitle><style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style></v2_legend><v2_chartTitle refQuery="equipment risk ascessment"><style><defaultStyles><defaultStyle refStyle="ct"/></defaultStyles><CSS value="font-size:12pt"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Top 10 Equipment Risk Index</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartTitle><v2_chartSubTitle refQuery="equipment risk ascessment"><style><defaultStyles><defaultStyle refStyle="cs"/></defaultStyles><CSS value="font-size:10pt;font-weight:normal"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Based on Consequence of Failure (Criticality) plus Probability of Failure (WO Count Percentile)</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartSubTitle><reportDrills><reportDrill name="Drill-Through Definition1"><drillLabel><dataSource><staticValue/></dataSource></drillLabel><drillTarget method="execute" outputFormat="PDF" showInNewWindow="true"><reportPath path="/content/folder[@name='RM01']/report[@name='EQUIP']"><XMLAttributes><XMLAttribute name="ReportName" output="no" value="EQUIP"/><XMLAttribute name="class" output="no" value="report"/></XMLAttributes></reportPath><drillLinks><drillLink><drillTargetContext><parameterContext parameter="SEL_START"/></drillTargetContext><drillSourceContext><parameterContext parameter="SEL_START"/></drillSourceContext></drillLink><drillLink><drillTargetContext><parameterContext parameter="SEL_END"/></drillTargetContext><drillSourceContext><parameterContext parameter="SEL_END"/></drillSourceContext></drillLink><drillLink><drillTargetContext><parameterContext parameter="SEL_ORG"/></drillTargetContext><drillSourceContext><parameterContext parameter="SEL_ORG"/></drillSourceContext></drillLink><drillLink><drillTargetContext><parameterContext parameter="SEL_MRC"/></drillTargetContext><drillSourceContext><parameterContext parameter="SEL_MRC"/></drillSourceContext></drillLink><drillLink><drillTargetContext><parameterContext parameter="SEL_CLASS"/></drillTargetContext><drillSourceContext><parameterContext parameter="SEL_CLASS"/></drillSourceContext></drillLink><drillLink><drillTargetContext><parameterContext parameter="SEL_OBJ"/></drillTargetContext><drillSourceContext><dataItemContext refDataItem="EVT_OBJECT"/></drillSourceContext></drillLink></drillLinks></drillTarget></reportDrill></reportDrills><conditionalRender refVariable="EQUIP_RISK"><renderFor refVariableValue="1"/></conditionalRender></v2_combinationChart>
+												</contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><v2_combinationChart depth="75" maxHotspots="10000" name="Combination Chart10" refQuery="labor over">
+														<v2_combinationTypeTooltips/>
+														<v2_commonAxis>
+															<v2_ordinalAxis>
+																<v2_axisTitle refQuery="labor over">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+															</v2_ordinalAxis>
+															<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="PER_DESC"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="HRSOVER" sortOrder="descending"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_commonAxis>
+														<v2_topLeftAxis>
+															<v2_combinationChartTypes>
+																<v2_bar barShape="cylinder" seriesType="stacked">
+																	<!-- v2_solidPaletteRef ref=&amp;amp;amp;quot;gDefaultSolid&amp;amp;amp;quot;/ -->
+																	<v2_solidPalette>
+																		<v2_solidPaletteEntries>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#333399"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC9933"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#993333"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CCCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#336633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6699CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF0033"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FF6633"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#CC0099"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#66CC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#0033FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6666FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#9900FF"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#339966"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#FFCC00"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#6633CC"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																			<v2_solidPaletteEntry>
+																				<v2_fillEffect>
+																					<v2_solidColor color="#999999"/>
+																				</v2_fillEffect>
+																			</v2_solidPaletteEntry>
+																		</v2_solidPaletteEntries>
+																	</v2_solidPalette>
+																</v2_bar>
+															</v2_combinationChartTypes>
+															<v2_axis>
+																<v2_axisTitle refQuery="labor over">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style></v2_axisTitle>
+																<v2_axisLine lineWeight="0pt" majorTickMarkLocation="none"/>
+																<v2_axisRange>
+																	<v2_automaticRange/>
+																</v2_axisRange>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+																<v2_majorGridlines lineColor="#cccccc" lineWeight="0pt"/>
+															</v2_axis>
+														</v2_topLeftAxis>
+														<style>
+															<CSS value="margin-top:0.25in;width:7in;height:3.5in"/><defaultStyles><defaultStyle refStyle="ch"/></defaultStyles></style>
+														<noDataHandler>
+															<contents>
+																<block>
+																	<contents>
+																		<textItem>
+																			<dataSource>
+																				<staticValue>No Data Available</staticValue>
+																			</dataSource>
+																			<style>
+																				<CSS value="padding:10px 18px;"/>
+																			</style>
+																		</textItem>
+																	</contents>
+																</block>
+															</contents>
+														</noDataHandler>
+														<v2_defaultChartMeasure refDataItem="HRSOVER"/><v2_legend><v2_legendPosition><v2_legendPreset/></v2_legendPosition><v2_legendTitle refQuery="labor over"><v2_chartTextContents><v2_automaticText/></v2_chartTextContents><style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style></v2_legendTitle><style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style></v2_legend><v2_chartTitle refQuery="labor over"><style><defaultStyles><defaultStyle refStyle="ct"/></defaultStyles><CSS value="font-size:12pt"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Top 10 Employees</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartTitle><v2_chartSubTitle refQuery="labor over"><style><defaultStyles><defaultStyle refStyle="cs"/></defaultStyles><CSS value="font-size:10pt;font-weight:normal"/></style><v2_chartTextItems><v2_chartTextItem><dataSource><staticValue>Total Labor Hours Exceeding Activity Estimated Hours</staticValue></dataSource></v2_chartTextItem></v2_chartTextItems></v2_chartSubTitle><reportDrills><reportDrill name="Drill-Through Definition1"><drillLabel><dataSource><staticValue/></dataSource></drillLabel><drillTarget method="execute" outputFormat="PDF" sendFilterContext="true" showInNewWindow="true"><reportPath path="/content/folder[@name='RM01']/report[@name='EMPLOYEE']"><XMLAttributes><XMLAttribute name="ReportName" output="no" value="EMPLOYEE"/><XMLAttribute name="class" output="no" value="report"/></XMLAttributes></reportPath><drillLinks><drillLink><drillTargetContext><parameterContext parameter="SEL_START"/></drillTargetContext><drillSourceContext><parameterContext parameter="SEL_START"/></drillSourceContext></drillLink><drillLink><drillTargetContext><parameterContext parameter="SEL_END"/></drillTargetContext><drillSourceContext><parameterContext parameter="SEL_END"/></drillSourceContext></drillLink><drillLink><drillTargetContext><parameterContext parameter="SEL_ORG"/></drillTargetContext><drillSourceContext><parameterContext parameter="SEL_ORG"/></drillSourceContext></drillLink><drillLink><drillTargetContext><parameterContext parameter="SEL_MRC"/></drillTargetContext><drillSourceContext><parameterContext parameter="SEL_MRC"/></drillSourceContext></drillLink><drillLink><drillTargetContext><parameterContext parameter="SEL_CLASS"/></drillTargetContext><drillSourceContext><parameterContext parameter="SEL_CLASS"/></drillSourceContext></drillLink><drillLink><drillTargetContext><parameterContext parameter="EMP"/></drillTargetContext><drillSourceContext><dataItemContext refDataItem="PER_DESC"/></drillSourceContext></drillLink></drillLinks></drillTarget></reportDrill></reportDrills><conditionalRender refVariable="EMP_OVER"><renderFor refVariableValue="1"/></conditionalRender></v2_combinationChart>
+												</contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow></tableRows></table></contents>
+								</pageBody>
+								<pageHeader>
+									<contents>
+										
+									<table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><image>
+			<dataSource>
+				
+			<dataItemValue refDataItem="D7ILOGO"/></dataSource>
+		</image></contents><style><CSS value="background-color:silver;width:20%"/></style></tableCell><tableCell><contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Top Ten Report</staticValue></dataSource><style><CSS value="font-size:14pt"/></style></textItem></contents><style><CSS value="text-align:center;font-weight:bold;font-size:12pt"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>From  </staticValue></dataSource></textItem><textItem><dataSource><dataItemValue refDataItem="FROMDATE"/></dataSource><style><CSS value="font-style:italic;font-size:10pt"/></style></textItem><textItem><dataSource><staticValue>  To  </staticValue></dataSource><style><CSS value="font-size:10pt"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="TODATE"/></dataSource><style><CSS value="font-style:italic;font-size:10pt"/></style></textItem></contents><style><CSS value="text-align:center;font-weight:bold;font-size:11pt"/></style></tableCell></tableCells></tableRow></tableRows></table></contents><style><CSS value="background-color:silver;width:60%"/></style></tableCell><tableCell><contents><image>
+			<dataSource>
+				
+			<dataItemValue refDataItem="CMPLOGO"/></dataSource>
+		</image></contents><style><CSS value="text-align:right;background-color:silver;width:20%"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="height:10px"/></style></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="3"><contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Organization: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="ORG"/></dataSource><style><CSS value="font-style:italic"/></style></textItem></contents><style><CSS value="width:33.33%;font-size:8pt"/></style></tableCell><tableCell><contents><textItem><dataSource><staticValue>Department: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="MRC"/></dataSource><style><CSS value="font-style:italic"/></style></textItem></contents><style><CSS value="width:33.33%;font-size:8pt"/></style></tableCell><tableCell><contents><textItem><dataSource><staticValue>Equipment Class: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="ECLASS"/></dataSource><style><CSS value="font-style:italic"/></style></textItem></contents><style><CSS value="width:33.33%;font-size:8pt"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="3"><contents/></tableCell></tableCells></tableRow></tableRows></table></contents></tableCell></tableCells></tableRow></tableRows></table></contents>
+									<style>
+										<defaultStyles>
+											<defaultStyle refStyle="ph"/>
+										</defaultStyles>
+										<CSS value="padding-bottom:10px"/>
+									</style>
+								</pageHeader>
+								<pageFooter>
+									<contents>
+										<table>
+											<tableRows>
+												<tableRow>
+													<tableCells>
+														<tableCell>
+															<contents>
+																<date>
+																	<style>
+																		<dataFormat>
+																			<dateFormat/>
+																		</dataFormat>
+																	</style>
+																</date>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:left;width:25%"/>
+															</style>
+														</tableCell>
+														<tableCell>
+															<contents>
+																<pageNumber/>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:center;width:50%"/>
+															</style>
+														</tableCell>
+														<tableCell>
+															<contents>
+																<time>
+																	<style>
+																		<dataFormat>
+																			<timeFormat/>
+																		</dataFormat>
+																	</style>
+																</time>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:right;width:25%"/>
+															</style>
+														</tableCell>
+													</tableCells>
+												</tableRow>
+											</tableRows>
+											<style>
+												<defaultStyles>
+													<defaultStyle refStyle="tb"/>
+												</defaultStyles>
+												<CSS value="border-collapse:collapse;width:100%"/>
+											</style>
+										</table>
+									</contents>
+									<style>
+										<defaultStyles>
+											<defaultStyle refStyle="pf"/>
+										</defaultStyles>
+										<CSS value="padding-top:10px"/>
+									</style>
+								</pageFooter>
+							</page>
+						</reportPages>
+					<promptPages><page name="Prompt Page1">
+			<pageHeader>
+				<contents>
+					<block>
+						<contents>
+							<textItem>
+								<dataSource>
+									<staticValue/>
+								</dataSource>
+								<style>
+									<defaultStyles>
+										<defaultStyle refStyle="tt"/>
+									</defaultStyles>
+								</style>
+							</textItem>
+						</contents>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="ta"/>
+							</defaultStyles>
+						</style>
+					</block>
+				</contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="hp"/>
+					</defaultStyles>
+				</style>
+			</pageHeader>
+			<pageBody>
+				<contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>SEL_START</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox multiSelect="false" numbersOnly="false" parameter="SEL_START" range="false" required="true"><defaultSelections><defaultSimpleSelection>2010-01-01</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>SEL_END</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox multiSelect="false" numbersOnly="false" parameter="SEL_END" range="false" required="true"><defaultSelections><defaultSimpleSelection>2014-12-31</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>SEL_ORG</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox multiSelect="false" numbersOnly="false" parameter="SEL_ORG" range="false" required="true"><defaultSelections><defaultSimpleSelection>%</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>SEL_MRC</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox multiSelect="false" numbersOnly="false" parameter="SEL_MRC" range="false" required="true"><defaultSelections><defaultSimpleSelection>%</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>SEL_CLASS</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox multiSelect="false" numbersOnly="false" parameter="SEL_CLASS" range="false" required="true"><defaultSelections><defaultSimpleSelection>%</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>PROB_COST</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox parameter="PROB_COST"><defaultSelections><defaultSimpleSelection>-</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>PROB_COUNT</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox parameter="PROB_COUNT"><defaultSelections><defaultSimpleSelection>-</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>EQUIP_COST</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox parameter="EQUIP_COST"><defaultSelections><defaultSimpleSelection>-</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>EQUIP_MATCOST</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox parameter="EQUIP_MATCOST"><defaultSelections><defaultSimpleSelection>-</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>EQUIP_LABOR</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox parameter="EQUIP_LABOR"><defaultSelections><defaultSimpleSelection>-</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>EQUIP_INTLABOR</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox parameter="EQUIP_INTLABOR"><defaultSelections><defaultSimpleSelection>-</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>EQUIP_CONTLABOR</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox parameter="EQUIP_CONTLABOR"><defaultSelections><defaultSimpleSelection>-</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>EQUIP_WOCOUNT</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox parameter="EQUIP_WOCOUNT"><defaultSelections><defaultSimpleSelection>-</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>EQUIP_RISK</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox parameter="EQUIP_RISK"><defaultSelections><defaultSimpleSelection>-</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>EMP_OVER</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox parameter="EMP_OVER"><defaultSelections><defaultSimpleSelection>-</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow></tableRows></table></contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="py"/>
+					</defaultStyles>
+				</style>
+			</pageBody>
+			<pageFooter>
+				<contents>
+					<promptButton type="cancel">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="back">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="next">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="finish">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+				</contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="fp"/>
+					</defaultStyles>
+				</style>
+			</pageFooter>
+			<style>
+				<defaultStyles>
+					<defaultStyle refStyle="pp"/>
+				</defaultStyles>
+			</style>
+		</page></promptPages></layout>
+				</layouts>
+			<XMLAttributes><XMLAttribute name="RS_CreateExtendedDataItems" output="no" value="true"/><XMLAttribute name="listSeparator" output="no" value=","/><XMLAttribute name="RS_modelModificationTime" output="no" value="2015-10-21T13:57:21.113Z"/></XMLAttributes><reportVariables><reportVariable name="RowsExist" type="boolean">
+			<reportExpression>ParamDisplayValue('SelectedObject') &lt;&gt; '*'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="PROB_COST" type="boolean">
+			<reportExpression>ParamDisplayValue('PROB_COST') = '+'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="PROB_COUNT" type="boolean">
+			<reportExpression>ParamDisplayValue('PROB_COUNT') = '+'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="EQUIP_COST" type="boolean">
+			<reportExpression>ParamDisplayValue('EQUIP_COST') = '+'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="EQUIP_MATCOST" type="boolean">
+			<reportExpression>ParamDisplayValue('EQUIP_MATCOST') = '+'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="EQUIP_LABOR" type="boolean">
+			<reportExpression>ParamDisplayValue('EQUIP_LABOR') = '+'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="EQUIP_INTLABOR" type="boolean">
+			<reportExpression>ParamDisplayValue('EQUIP_INTLABOR') = '+'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="EQUIP_CONTLABOR" type="boolean">
+			<reportExpression>ParamDisplayValue('EQUIP_CONTLABOR') = '+'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="EQUIP_WOCOUNT" type="boolean">
+			<reportExpression>ParamDisplayValue('EQUIP_WOCOUNT') = '+'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="EQUIP_RISK" type="boolean">
+			<reportExpression>ParamDisplayValue('EQUIP_RISK') = '+'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="EMP_OVER" type="boolean">
+			<reportExpression>ParamDisplayValue('EMP_OVER') = '+'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable></reportVariables><reportName>T10REP</reportName></report>

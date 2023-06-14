@@ -1,0 +1,27 @@
+wspf_10_cmf_evtstatus
+
+            vStatus = vFormPanel.getFldValue('wspf_10_cmf_status'),
+            vFlag = (vStatus === "Change Request") ? false : true,
+
+fieldDefaults: {
+                    readOnly : vFlag 
+                },
+
+
+              handler: function(btn) {
+                              if(vFlag = false) {btn.up('window').clos()};
+                var win = btn.up('window'),
+                  form = win.down('form'),
+                   values = form.getValues();
+
+            vOwner = vFormPanel.getFldValue('wspf_10_cmf_owner'),
+            vUser = gAppData.installParams.user,
+            vStatus = vFormPanel.getFldValue('wspf_10_cmf_status'),
+            vFlag = (vUser === vOwner) ? true : false,
+
+
+editable: (vUser === "MLAGUITTON") ? true : false || (vUser === "R5") ? true : false,
+editable: (vUser === "RKOCH") ? true : false || (vUser === "R5") ? true : false,
+editable: (vUser === "DFRISWELL") ? true : false || (vUser === "R5") ? true : false,
+editable: (vUser === vOwner) ? true : false || (vUser === "R5") ? true : false,
+editable: (vUser === "SBAHUTH") ? true : false || (vUser === "R5") ? true : false || (vUser === "JTAUVRY") ? true : false,

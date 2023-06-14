@@ -1,0 +1,3 @@
+/* Do the actual calculation. */
+      EXECUTE o7calcobjrrscore @eqrobjcode, @eqrobjorg, @type, @eqrrankingcode, @eqrrankingorg, @eqrrankingrevision, NULL,
+                               @score OUTPUT, @rrindex OUTPUT, @message OUTPUT, @recsdone OUTPUT, @recslocked OUTPUT, @chk OUTPUT

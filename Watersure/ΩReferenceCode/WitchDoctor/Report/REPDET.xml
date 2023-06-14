@@ -1,0 +1,749 @@
+<report xmlns="http://developer.cognos.com/schemas/report/11.0/" expressionLocale="en" useStyleVersion="10"><!--RSU-SPC-0093 The report specification was upgraded from &amp;quot;http://developer.cognos.com/schemas/report/10.0/&amp;quot; to &amp;quot;http://developer.cognos.com/schemas/report/11.0/&amp;quot; at 2015-2-19. 8:52:54-->
+				<modelPath>/content/package[@name='InforEAMPackage_111']/model[@name='model']</modelPath>
+				<drillBehavior modelBasedDrillThru="true"/>
+				<queries>
+					
+				<query name="display Parameters">
+			<source>
+				
+			<sqlQuery dataSource="AdvRepData" name="SQL2">
+			<sqlText>select 
+obj_code,
+obj_desc,
+obj_org,
+obj_mrc,
+obj_value,
+obj_commiss,
+dbo.repgetdesc('EN','CLAS', obj_class, 'OBJ', null)   class
+from r5objects
+where  obj_code = #prompt('EQUIP')#  
+
+
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="obj_code"/><mdProjectedItem name="obj_desc"/><mdProjectedItem name="obj_org"/><mdProjectedItem name="obj_mrc"/><mdProjectedItem name="obj_value"/><mdProjectedItem name="obj_commiss"/><mdProjectedItem name="class"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="D7ILOGO"><expression>#sq($INSTALLPARAMETERS{'EAMRLOGO'})#</expression></dataItem><dataItem name="CMPLOGO"><expression>#sq($INSTALLPARAMETERS{'CMPRLOGO'})#</expression></dataItem><dataItem name="obj_code"><expression>[SQL2].[obj_code]</expression></dataItem><dataItem name="obj_desc"><expression>[SQL2].[obj_desc]</expression></dataItem><dataItem name="obj_org"><expression>[SQL2].[obj_org]</expression></dataItem><dataItem name="obj_mrc"><expression>[SQL2].[obj_mrc]</expression></dataItem><dataItem name="obj_value"><expression>[SQL2].[obj_value]</expression></dataItem><dataItem name="obj_commiss"><expression>[SQL2].[obj_commiss]</expression></dataItem><dataItem name="class"><expression>[SQL2].[class]</expression></dataItem></selection>
+		</query><query name="main list">
+			<source>
+				
+			<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>select distinct
+obj_code,
+year(odp_enddate) "Year",
+odp_bookvalue "Book Value",
+case when year(odp_enddate) &lt;= year(getdate())
+then
+	(select sum(dbo.REPLABOUR(EVT_CODE)) + sum(dbo.REPMATERIAL(EVT_CODE))
+	from r5events 
+	where evt_object = obj_code and evt_object_org = obj_org and year(evt_target) =  year(odp_enddate))
+else 	dbo.GET_COMPOUND_VALUE(thisyear, #prompt('MAINT_INC')#, year(odp_enddate)   - year(getdate()) )
+end "Maint Cost"
+
+from r5objects 
+inner join r5objdepreciation 
+	on obj_code = odp_object and obj_org = odp_object_org
+inner join
+	(select evt_object tequip, evt_object_org torg, sum(dbo.REPLABOUR(EVT_CODE)) + sum(dbo.REPMATERIAL(EVT_CODE)) thisyear
+	from r5events 
+	WHERE year(evt_target) =  year(getdate())                     
+	group by evt_object, evt_object_org) t 
+	on tequip = obj_code and torg = obj_org
+  
+where datepart(month,odp_enddate) = 12
+and odp_mode = 'M'
+and  obj_code =  #prompt('EQUIP')#
+and obj_org = #prompt('ORG')# </sqlText>
+		<mdProjectedItems><mdProjectedItem name="obj_code"/><mdProjectedItem name="Year"/><mdProjectedItem name="Book Value"/><mdProjectedItem name="Maint Cost"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="Year"><expression>[SQL1].[Year]</expression></dataItem><dataItem name="Book Value" rollupAggregate="summarize"><expression>[SQL1].[Book Value]</expression></dataItem><dataItem name="Maint Cost" rollupAggregate="summarize"><expression>[SQL1].[Maint Cost]</expression></dataItem><dataItem name="Combined  Cost" rollupAggregate="summarize"><expression>[Book Value] + [Maint Cost]</expression></dataItem><dataItem name="MINVAL"><expression>minimum ([Combined  Cost] for [obj_code] )</expression></dataItem><dataItem name="obj_code"><expression>[SQL1].[obj_code]</expression></dataItem></selection>
+		</query><query name="wo detail">
+			<source>
+				
+			<sqlQuery dataSource="AdvRepData" name="SQL3">
+			<sqlText>select
+evt_code "Work Order",
+evt_desc "Description",
+evt_target "Date",
+dbo.repgetdesc('EN','UCOD',evt_jobtype, 'JBTP',null) "Work Type",
+dbo.repgetdesc('EN','UCOD',evt_status, 'EVST',null) "Status",
+dbo.replabour(evt_code) "Labor Cost",
+dbo.repmaterial(evt_code) "Material Cost"
+from r5events
+where evt_type in ('JOB','PPM')
+and evt_object =  #prompt('EQUIP')#
+and evt_object_org = #prompt('ORG')# 
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="Work Order"/><mdProjectedItem name="Description"/><mdProjectedItem name="Date"/><mdProjectedItem name="Work Type"/><mdProjectedItem name="Status"/><mdProjectedItem name="Labor Cost"/><mdProjectedItem name="Material Cost"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="Work Order"><expression>[SQL3].[Work Order]</expression></dataItem><dataItem name="Description"><expression>[SQL3].[Description]</expression></dataItem><dataItem name="Date"><expression>[SQL3].[Date]</expression></dataItem><dataItem name="Work Type"><expression>[SQL3].[Work Type]</expression></dataItem><dataItem name="Status"><expression>[SQL3].[Status]</expression></dataItem><dataItem name="Labor Cost"><expression>[SQL3].[Labor Cost]</expression></dataItem><dataItem name="Material Cost"><expression>[SQL3].[Material Cost]</expression></dataItem><dataItem label="Total Cost" name="Data Item1"><expression>[Labor Cost] + [Material Cost]</expression></dataItem><dataItem label="Year" name="Data Item2"><expression>year ([Date])</expression></dataItem><dataItemListSummary aggregateMethod="total" name="Total(Data Item1)" refDataItem="Data Item1"/></selection>
+		</query></queries>
+				<layouts>
+					<layout>
+						<reportPages>
+							<page name="Page1" refQuery="display Parameters"><style><defaultStyles><defaultStyle refStyle="pg"/></defaultStyles></style>
+								<pageBody><style><defaultStyles><defaultStyle refStyle="pb"/></defaultStyles><CSS value="text-align:center"/></style>
+									<contents>
+										
+									<table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents>
+												<v2_combinationChart maxHotspots="10000" name="Combination Chart1" refQuery="main list">
+														<v2_combinationTypeTooltips/>
+														<v2_legend>
+															<v2_legendPosition>
+																<v2_legendPreset/>
+															</v2_legendPosition>
+															<v2_legendTitle refQuery="main list">
+																<v2_chartTextContents>
+																	<v2_automaticText/>
+																</v2_chartTextContents>
+																<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style>
+															</v2_legendTitle>
+															<style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style>
+														</v2_legend>
+														<v2_commonAxis>
+															<v2_ordinalAxis>
+																<v2_axisTitle refQuery="main list">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="at"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisTitle>
+																<v2_axisLine lineWeight="0"/>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisLabels>
+															</v2_ordinalAxis>
+															<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Year"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="Year"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_commonAxis>
+														<v2_topLeftAxis>
+															<v2_combinationChartTypes>
+																<v2_line lineAreaShape="smooth">
+																	<v2_linePalette markerSize="5pt">
+																		
+																	<v2_linePaletteEntries><v2_linePaletteEntry lineWeight="3px">
+																				<v2_pointPaletteEntry markerShape="circle">
+																					<v2_fillEffect defaultColor="#134bea">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#134bea"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#0b2982"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#134bea"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#0b2982"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry lineWeight="3px">
+																				<v2_pointPaletteEntry markerShape="circle">
+																					<v2_fillEffect defaultColor="#f2cd00">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#f2cd00"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#f9be09"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#f2cd00"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#f9be09"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry lineWeight="3px">
+																				<v2_pointPaletteEntry markerShape="circle">
+																					<v2_fillEffect defaultColor="#e01b1b">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#e01b1b"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#ab0909"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#e01b1b"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#ab0909"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry>
+																				<v2_pointPaletteEntry>
+																					<v2_fillEffect defaultColor="#50cb1c">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#50cb1c"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#42982f"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#50cb1c"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#42982f"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry>
+																				<v2_pointPaletteEntry>
+																					<v2_fillEffect defaultColor="#ff8a00">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#ff8a00"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#de4f01"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#ff8a00"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#de4f01"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry>
+																				<v2_pointPaletteEntry>
+																					<v2_fillEffect defaultColor="#3d3d3d">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#3d3d3d"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#0a0a0a"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#3d3d3d"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#0a0a0a"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry>
+																				<v2_pointPaletteEntry>
+																					<v2_fillEffect defaultColor="#bf38e1">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#bf38e1"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#8a1dde"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#bf38e1"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#8a1dde"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry>
+																				<v2_pointPaletteEntry>
+																					<v2_fillEffect defaultColor="#8514c7">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#8514c7"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#2e0072"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#8514c7"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#2e0072"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry>
+																				<v2_pointPaletteEntry>
+																					<v2_fillEffect defaultColor="#0f8b03">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#0f8b03"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#044a01"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#0f8b03"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#044a01"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry>
+																				<v2_pointPaletteEntry>
+																					<v2_fillEffect defaultColor="#95bf14">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#95bf14"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#828c0b"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#95bf14"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#828c0b"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry>
+																				<v2_pointPaletteEntry>
+																					<v2_fillEffect defaultColor="#4791da">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#4791da"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#2060b7"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#4791da"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#2060b7"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry>
+																				<v2_pointPaletteEntry>
+																					<v2_fillEffect defaultColor="#76dde6">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#76dde6"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#2cb6c7"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#76dde6"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#2cb6c7"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry>
+																				<v2_pointPaletteEntry>
+																					<v2_fillEffect defaultColor="#060d95">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#060d95"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#06034f"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#060d95"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#06034f"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																			<v2_linePaletteEntry>
+																				<v2_pointPaletteEntry>
+																					<v2_fillEffect defaultColor="#c3550b">
+																						<v2_linearGradient gradientAngle="270">
+																							<v2_gradientColor colorPosition="0" gradientColor="#c3550b"/>
+																							<v2_gradientColor colorPosition="100" gradientColor="#a33a00"/>
+																						</v2_linearGradient>
+																					</v2_fillEffect>
+																				</v2_pointPaletteEntry>
+																				<v2_lineFill>
+																					<v2_linearGradient gradientAngle="270">
+																						<v2_gradientColor colorPosition="0" gradientColor="#c3550b"/>
+																						<v2_gradientColor colorPosition="100" gradientColor="#a33a00"/>
+																					</v2_linearGradient>
+																				</v2_lineFill>
+																			</v2_linePaletteEntry>
+																		</v2_linePaletteEntries></v2_linePalette>
+																	<!-- v2_linePaletteRef ref=&amp;amp;amp;quot;gDefaultLine&amp;amp;amp;quot;/ -->
+																	<chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Book Value"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><style><dataFormat><currencyFormat currencySymbol="$"/></dataFormat></style></chartNodeMember></chartNodeMembers></chartNode><chartNode><chartNodeMembers><chartNodeMember refDataItem="Combined  Cost"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><style><dataFormat><currencyFormat/></dataFormat></style></chartNodeMember></chartNodeMembers></chartNode><chartNode><chartNodeMembers><chartNodeMember refDataItem="Maint Cost"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><style><dataFormat><currencyFormat/></dataFormat></style></chartNodeMember></chartNodeMembers></chartNode></chartNodes></v2_line>
+															</v2_combinationChartTypes>
+															<v2_axis>
+																<v2_axisTitle refQuery="main list">
+																	<v2_chartTextContents>
+																		<v2_automaticText/>
+																	</v2_chartTextContents>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="at"/>
+																		</defaultStyles>
+																	</style>
+																</v2_axisTitle>
+																<v2_axisLine lineWeight="0"/>
+																<v2_axisRange>
+																	<v2_automaticRange/>
+																</v2_axisRange>
+																<v2_axisLabels>
+																	<style>
+																		<defaultStyles>
+																			<defaultStyle refStyle="al"/>
+																		</defaultStyles>
+																		<dataFormat><currencyFormat currencySymbol="$"/></dataFormat></style>
+																</v2_axisLabels>
+																<v2_majorGridlines lineColor="#CCCCCC" lineWeight="0"/>
+																<v2_majorBackgroundColors>
+																	<v2_firstBackgroundColor color="#D2D2D2" transparency="50"/>
+																	<v2_secondBackgroundColor color="#E2E2E2" transparency="50"/>
+																</v2_majorBackgroundColors>
+															</v2_axis>
+														</v2_topLeftAxis>
+														<style>
+															<defaultStyles>
+																<defaultStyle refStyle="ch"/>
+															</defaultStyles>
+														</style>
+														<noDataHandler>
+															<contents>
+																<block>
+																	<contents>
+																		<textItem>
+																			<dataSource>
+																				<staticValue>No Data Available</staticValue>
+																			</dataSource>
+																			<style>
+																				<CSS value="padding:10px 18px;"/>
+																			</style>
+																		</textItem>
+																	</contents>
+																</block>
+															</contents>
+														</noDataHandler>
+													</v2_combinationChart>
+												</contents><style><CSS value="width:50%;vertical-align:top"/></style></tableCell><tableCell><contents><list horizontalPagination="true" name="List1" refQuery="main list">
+			<listColumnBodyStyle><conditionalStyles><conditionalStyleCases refVariable="minyear"><conditionalStyle refVariableValue="1"><CSS value="background-color:#CCFFCC"/></conditionalStyle></conditionalStyleCases><conditionalStyleDefault/></conditionalStyles></listColumnBodyStyle>
+			
+			
+			<noDataHandler>
+				<contents>
+					<block>
+						<contents>
+							<textItem>
+								<dataSource>
+									<staticValue>No Data Available</staticValue>
+								</dataSource>
+								<style>
+									<CSS value="padding:10px 18px;"/>
+								</style>
+							</textItem>
+						</contents>
+					</block>
+				</contents>
+			</noDataHandler>
+			<style>
+				<CSS value="border-collapse:collapse"/>
+				<defaultStyles>
+					<defaultStyle refStyle="ls"/>
+				</defaultStyles>
+			</style>
+		<listColumns><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Year"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><dataFormat><numberFormat useGrouping="false"/></dataFormat></style><contents><textItem><dataSource><dataItemValue refDataItem="Year"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Book Value"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><dataFormat><currencyFormat/></dataFormat></style><contents><textItem><dataSource><dataItemValue refDataItem="Book Value"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Maint Cost"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><dataFormat><currencyFormat/></dataFormat></style><contents><textItem><dataSource><dataItemValue refDataItem="Maint Cost"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Combined  Cost"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><dataFormat><currencyFormat/></dataFormat></style><contents><textItem><dataSource><dataItemValue refDataItem="Combined  Cost"/></dataSource></textItem></contents></listColumnBody></listColumn></listColumns><sortList><sortItem refDataItem="Year" sortOrder="ascending"/></sortList><propertyList><propertyItem refDataItem="MINVAL"/></propertyList></list></contents><style><CSS value="width:50%;vertical-align:top;text-align:right"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow></tableRows></table></contents>
+								</pageBody>
+								<pageHeader>
+									<contents>
+										
+									<table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><image>
+			<dataSource>
+				
+			<dataItemValue refDataItem="D7ILOGO"/></dataSource>
+		</image></contents><style><CSS value="background-color:silver;width:25%"/></style></tableCell><tableCell><contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Vehicle Replacement Priority Detail</staticValue></dataSource></textItem></contents><style><CSS value="text-align:center;font-weight:bold;font-size:12pt"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="text-align:center;font-weight:bold;font-size:12pt"/></style></tableCell></tableCells></tableRow></tableRows></table></contents><style><CSS value="background-color:silver;width:50%"/></style></tableCell><tableCell><contents><image>
+			<dataSource>
+				
+			<dataItemValue refDataItem="CMPLOGO"/></dataSource>
+		</image></contents><style><CSS value="text-align:right;background-color:silver;width:25%"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="height:10px"/></style></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="3"><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Organization: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_org"/></dataSource></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Equipment: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_code"/></dataSource></textItem></contents><style><CSS value="height:10px"/></style></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Description: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_desc"/></dataSource></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Department: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_mrc"/></dataSource></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Equipment Class: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="class"/></dataSource></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Original Value: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_value"/></dataSource><style><dataFormat><currencyFormat/></dataFormat></style></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Purchase Date: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_commiss"/></dataSource><style><dataFormat><dateFormat dateStyle="medium"/></dataFormat></style></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="height:10px"/></style></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow></tableRows></table></contents>
+									<style>
+										<defaultStyles>
+											<defaultStyle refStyle="ph"/>
+										</defaultStyles>
+										<CSS value="padding-bottom:10px"/>
+									</style>
+								</pageHeader>
+								<pageFooter>
+									<contents>
+										<table>
+											<tableRows>
+												<tableRow>
+													<tableCells>
+														<tableCell>
+															<contents>
+																<date>
+																	<style>
+																		<dataFormat>
+																			<dateFormat/>
+																		</dataFormat>
+																	</style>
+																</date>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:left;width:25%"/>
+															</style>
+														</tableCell>
+														<tableCell>
+															<contents>
+																<pageNumber/>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:center;width:50%"/>
+															</style>
+														</tableCell>
+														<tableCell>
+															<contents>
+																<time>
+																	<style>
+																		<dataFormat>
+																			<timeFormat/>
+																		</dataFormat>
+																	</style>
+																</time>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:right;width:25%"/>
+															</style>
+														</tableCell>
+													</tableCells>
+												</tableRow>
+											</tableRows>
+											<style>
+												<defaultStyles>
+													<defaultStyle refStyle="tb"/>
+												</defaultStyles>
+												<CSS value="border-collapse:collapse;width:100%"/>
+											</style>
+										</table>
+									</contents>
+									<style>
+										<defaultStyles>
+											<defaultStyle refStyle="pf"/>
+										</defaultStyles>
+										<CSS value="padding-top:10px"/>
+									</style>
+								</pageFooter>
+							</page>
+						<page name="Page2" refQuery="display Parameters"><style><defaultStyles><defaultStyle refStyle="pg"/></defaultStyles></style>
+								<pageBody><style><defaultStyles><defaultStyle refStyle="pb"/></defaultStyles><CSS value="text-align:center"/></style>
+									<contents>
+										
+									<list name="List3" refQuery="wo detail" showColumnTitles="hide">
+			<listColumns>
+				<listColumn>
+					<listColumnTitle>
+						<contents/>
+					</listColumnTitle>
+					<listColumnBody>
+						<contents><list horizontalPagination="true" name="List2" refQuery="wo detail">
+			
+			
+			
+			<noDataHandler>
+				<contents>
+					<block>
+						<contents>
+							<textItem>
+								<dataSource>
+									<staticValue>No Data Available</staticValue>
+								</dataSource>
+								<style>
+									<CSS value="padding:10px 18px;"/>
+								</style>
+							</textItem>
+						</contents>
+					</block>
+				</contents>
+			</noDataHandler>
+			<style>
+				<CSS value="border-collapse:collapse;width:100%"/>
+				<defaultStyles>
+					<defaultStyle refStyle="ls"/>
+				</defaultStyles>
+			</style>
+		<listColumns><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Work Order"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:left"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Work Order"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Description"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:left"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Description"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Date"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><dataFormat><dateFormat dateStyle="medium"/></dataFormat><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Date"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Work Type"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:left"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Work Type"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Status"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:left"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Status"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Labor Cost"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><dataFormat><currencyFormat/></dataFormat><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Labor Cost"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Material Cost"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><dataFormat><currencyFormat/></dataFormat><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Material Cost"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Data Item1"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><dataFormat><currencyFormat/></dataFormat><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Data Item1"/></dataSource></textItem></contents></listColumnBody></listColumn></listColumns><listOverallGroup><listFooter><listRows><listRow><rowCells><rowCell colSpan="7"><contents><textItem><dataSource><staticValue>Overall</staticValue></dataSource></textItem><textItem><dataSource><staticValue> - </staticValue></dataSource></textItem><textItem><dataSource><staticValue>Total</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Total(Data Item1)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><dataFormat><currencyFormat/></dataFormat><CSS value="text-align:center"/></style></rowCell></rowCells></listRow></listRows></listFooter></listOverallGroup></list></contents>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="sb"/>
+							</defaultStyles>
+						</style>
+					</listColumnBody>
+				</listColumn>
+			</listColumns>
+			
+			
+			
+			<style>
+				<CSS value="border-collapse:collapse; width:100%"/>
+				<defaultStyles>
+					<defaultStyle refStyle="sc"/>
+				</defaultStyles>
+			</style>
+		<listGroups><listGroup refDataItem="Data Item2"><listHeader><listRows><listRow><rowCells><rowCell><contents><textItem><dataSource><dataItemLabel refDataItem="Data Item2"/></dataSource></textItem><textItem><dataSource><staticValue>: </staticValue></dataSource></textItem><textItem><dataSource><dataItemValue refDataItem="Data Item2"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="sh"/></defaultStyles></style></rowCell></rowCells></listRow></listRows></listHeader><XMLAttributes><XMLAttribute name="RS_SectionedEdge" output="no" value="columns"/></XMLAttributes></listGroup></listGroups><sectionsFrame refFrame="List2" sectionedEdge="columns"/></list></contents>
+								</pageBody>
+								<pageHeader>
+									<contents>
+										
+									<table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><image>
+			<dataSource>
+				
+			<dataItemValue refDataItem="D7ILOGO"/></dataSource>
+		</image></contents><style><CSS value="background-color:silver;width:25%"/></style></tableCell><tableCell><contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Vehicle Replacement Priority Detail</staticValue></dataSource></textItem></contents><style><CSS value="text-align:center;font-weight:bold;font-size:12pt"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="text-align:center;font-weight:bold;font-size:12pt"/></style></tableCell></tableCells></tableRow></tableRows></table></contents><style><CSS value="background-color:silver;width:50%"/></style></tableCell><tableCell><contents><image>
+			<dataSource>
+				
+			<dataItemValue refDataItem="CMPLOGO"/></dataSource>
+		</image></contents><style><CSS value="text-align:right;background-color:silver;width:25%"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="height:10px"/></style></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="3"><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Organization: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_org"/></dataSource></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Equipment: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_code"/></dataSource></textItem></contents><style><CSS value="height:10px"/></style></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Description: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_desc"/></dataSource></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Department: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_mrc"/></dataSource></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Equipment Class: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="class"/></dataSource></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Original Value: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_value"/></dataSource><style><dataFormat><currencyFormat/></dataFormat></style></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="2"><contents><textItem><dataSource><staticValue>Purchase Date: </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><dataItemValue refDataItem="obj_commiss"/></dataSource><style><dataFormat><dateFormat dateStyle="medium"/></dataFormat></style></textItem></contents></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="height:10px"/></style></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow></tableRows></table></contents>
+									<style>
+										<defaultStyles>
+											<defaultStyle refStyle="ph"/>
+										</defaultStyles>
+										<CSS value="padding-bottom:10px"/>
+									</style>
+								</pageHeader>
+								<pageFooter>
+									<contents>
+										<table>
+											<tableRows>
+												<tableRow>
+													<tableCells>
+														<tableCell>
+															<contents>
+																<date>
+																	<style>
+																		<dataFormat>
+																			<dateFormat/>
+																		</dataFormat>
+																	</style>
+																</date>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:left;width:25%"/>
+															</style>
+														</tableCell>
+														<tableCell>
+															<contents>
+																<pageNumber/>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:center;width:50%"/>
+															</style>
+														</tableCell>
+														<tableCell>
+															<contents>
+																<time>
+																	<style>
+																		<dataFormat>
+																			<timeFormat/>
+																		</dataFormat>
+																	</style>
+																</time>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:right;width:25%"/>
+															</style>
+														</tableCell>
+													</tableCells>
+												</tableRow>
+											</tableRows>
+											<style>
+												<defaultStyles>
+													<defaultStyle refStyle="tb"/>
+												</defaultStyles>
+												<CSS value="border-collapse:collapse;width:100%"/>
+											</style>
+										</table>
+									</contents>
+									<style>
+										<defaultStyles>
+											<defaultStyle refStyle="pf"/>
+										</defaultStyles>
+										<CSS value="padding-top:10px"/>
+									</style>
+								</pageFooter>
+							<pageSetup orientation="portrait"/></page></reportPages>
+					<promptPages><page name="Prompt Page2">
+			<pageHeader>
+				<contents>
+					<block>
+						<contents>
+							<textItem>
+								<dataSource>
+									<staticValue/>
+								</dataSource>
+								<style>
+									<defaultStyles>
+										<defaultStyle refStyle="tt"/>
+									</defaultStyles>
+								</style>
+							</textItem>
+						</contents>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="ta"/>
+							</defaultStyles>
+						</style>
+					</block>
+				</contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="hp"/>
+					</defaultStyles>
+				</style>
+			</pageHeader>
+			<pageBody>
+				<contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>ORG</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox multiSelect="false" numbersOnly="false" parameter="ORG" range="false" required="true"><defaultSelections><defaultSimpleSelection>1000</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>EQUIP</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox multiSelect="false" numbersOnly="false" parameter="EQUIP" range="false" required="true"><defaultSelections><defaultSimpleSelection>100-100-100</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>MAINT_INC</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox multiSelect="false" numbersOnly="false" parameter="MAINT_INC" range="false" required="true"><defaultSelections><defaultSimpleSelection>25</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow></tableRows></table></contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="py"/>
+					</defaultStyles>
+				</style>
+			</pageBody>
+			<pageFooter>
+				<contents>
+					<promptButton type="cancel">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="back">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="next">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="finish">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+				</contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="fp"/>
+					</defaultStyles>
+				</style>
+			</pageFooter>
+			<style>
+				<defaultStyles>
+					<defaultStyle refStyle="pp"/>
+				</defaultStyles>
+			</style>
+		</page></promptPages><pageSetup orientation="landscape"/></layout>
+				</layouts>
+			<XMLAttributes><XMLAttribute name="RS_CreateExtendedDataItems" output="no" value="true"/><XMLAttribute name="listSeparator" output="no" value=","/><XMLAttribute name="RS_modelModificationTime" output="no" value="2015-05-19T18:54:06.860Z"/></XMLAttributes><reportName>REPDET</reportName><reportVariables><reportVariable name="minyear" type="boolean">
+			<reportExpression>[main list].[Combined  Cost] = [main list].[MINVAL]</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable></reportVariables></report>

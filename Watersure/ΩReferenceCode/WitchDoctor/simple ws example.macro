@@ -1,0 +1,41 @@
+Imports system.io
+Public Class Form1
+    Public readstream As New FileStream("config.txt", FileMode.Open, FileAccess.Read)
+    Public filereader As New StreamReader(readstream)
+
+    Public fpath As String = filereader.ReadLine
+    Public user As String = filereader.ReadLine
+    Public password As String = filereader.ReadLine
+    Public axisserver As String = filereader.ReadLine
+    Public tenant As String = filereader.ReadLine
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+
+        Dim woSERVICE As New GW.GetWorkOrderService
+        Dim woREQUEST As New GW.MP0024_GetWorkOrder_001
+        Dim woRESULT As New GW.MP0024_GetWorkOrder_001_Result
+
+        Dim WO As New GW.WOID_Type
+        Dim ORG As New GW.ORGANIZATIONID_Type
+
+        ORG.ORGANIZATIONCODE = orgtext.Text
+        WO.JOBNUM = wotext.Text
+        WO.ORGANIZATIONID = ORG
+        woREQUEST.WORKORDERID = WO
+
+        GLOBALS.Session = New Datastream.EWS.Session(user, password, "*", _
+             axisserver, tenant, False)
+
+        GLOBALS.Session.PrepareServiceRequest(woSERVICE)
+        Try
+            woRESULT = woSERVICE.GetWorkOrderOp(woREQUEST)
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+
+        desctext.Text = woRESULT.ResultData.WorkOrder.WORKORDERID.DESCRIPTION
+        GLOBALS.Session.CompleteServiceRequest(woSERVICE)
+    End Sub
+
+   
+End Class

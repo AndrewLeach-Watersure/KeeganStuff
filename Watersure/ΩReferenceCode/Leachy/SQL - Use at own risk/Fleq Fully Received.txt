@@ -1,0 +1,11 @@
+DECLARE 
+@status nvarchar(30),
+@closed nvarcahr(10);
+BEGIN
+SELECT @status = ORD_STATUS FROM R5ORDERS WHERE ORD_CODE = :rowid
+SELECT @closed = CASE SUM(ORL_ORDQTY)-SUM(ORL_RECVQTY) WHEN '0' THEN 'Yes' ELSE 'No' END FROM R5ORDERLINES WHERE ORL_ORDER = :rowid AND ORL_STATUS NOT LIKE 'C' GROUPBY ORL_ORDER
+
+
+IF ((@status = 'A' OR @status = 'PR') AND (@closed = 'Yes'))
+UPDATE ORD_STATUS = 'AR' WHERE ORD_CODE = :rowid
+END

@@ -1,0 +1,59 @@
+************************************
+A.L.
+Prevent certain changes of work order status by certain users when work order is of certain type and in certain status.
+Change Request Work Flow 
+Work Order side of things.
+*************************************
+
+
+DECLARE
+  @v_id   integer,
+  @user   nvarchar(100),
+  @snew   nvarchar(4),
+  @sdesc  nvarchar(80),
+  @sold   nvarchar(4),
+  @type   nvarchar(8),
+  @changeStatus nvarchar(30),
+  @wo nvarchar(24),
+  @grp    nvarchar(12);
+EXECUTE @v_id = O7SESS_CUR_USER @user OUTPUT;
+
+BEGIN
+  SELECT 
+@wo = evt_code,
+@sold=evt_udfchar06, 
+@type=evt_jobtype, 
+@snew=evt_status 
+FROM r5events 
+WHERE evt_sqlidentity=:rowid;
+
+SELECT 
+@grp=uog_group 
+FROM r5userorganization 
+WHERE uog_user=@user;
+
+SELECT
+@changeStatus = CMF_STATUS
+FROM U5CHMGMT WHERE CMF_EVENT = @wo;
+
+
+IF ( @snew != @sold OR @sold IS NULL )
+    BEGIN
+      IF ( @type = 'CMCH' 
+and @snew not in ('CHRV','CHWA','REJ','RQST','Q','CANC','CHCD','CHDD')) 
+
+OR( @type NOT IN ('CMCH','EMIN') 
+and @snew in ('CHRV','CHWA','CHCD','CHDD')) 
+OR (@type = 'EMIN' AND @snew not in ('PLAN','INPR','CHRV','CLOS','C'))
+      BEGIN
+        SELECT @sdesc=uco_desc FROM r5ucodes WHERE uco_entity='EVST' and uco_code=@snew;
+        RAISERROR('You may not change the Status to ''%s''', 16, 1, @sdesc);
+      END
+    END
+IF (@type = 'CMCH' AND @snew = 'CHRV' AND @changeStatus IS NULL)
+ RAISERROR('No change request form has been entered for this Work Order', 16, 1);
+
+BEGIN 
+IF (@type ='CMCH') BEGIN IF TRIGGER_NESTLEVEL() > 7
+RETURN  UPDATE r5events SET EVT_UDFCHKBOX03 = '+' WHERE evt_sqlidentity=:rowid; END END
+END

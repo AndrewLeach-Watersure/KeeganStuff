@@ -1,0 +1,483 @@
+Ext.define('EAM.custom.external_UUCHV2', {
+  extend: 'EAM.custom.AbstractExtensibleFramework',
+  getSelectors: function() {
+    return {
+      '[extensibleFramework] [tabName=HDR][isTabView=true] [name=wspf_10_cmf_reqbrief]': {
+        blur: function(field, lastValues) {
+          var vFormPanel = EAM.Utils.getCurrentTab().getFormPanel(),
+            wspf_10_cmf_car = vFormPanel.getFldValue('wspf_10_cmf_car'),
+            wspf_10_cmf_tempmodchbx = vFormPanel.getFldValue('wspf_10_cmf_tempmodchbx'),
+            wspf_10_cmf_permmodchbx = vFormPanel.getFldValue('wspf_10_cmf_permmodchbx'),
+            wspf_10_cmf_enginvchbx = vFormPanel.getFldValue('wspf_10_cmf_enginvchbx'),
+            wspf_10_cmf_need = vFormPanel.getFldValue('wspf_10_cmf_need'),
+            wspf_10_cmf_aims = vFormPanel.getFldValue('wspf_10_cmf_aims'),
+            wspf_10_cmf_roi = vFormPanel.getFldValue('wspf_10_cmf_roi'),
+            wspf_10_cmf_indschedres = vFormPanel.getFldValue('wspf_10_cmf_indschedres'),
+            wspf_10_cmf_stakeholders = vFormPanel.getFldValue('wspf_10_cmf_stakeholders'),
+            wspf_10_cmf_engsummary = vFormPanel.getFldValue('wspf_10_cmf_engsummary'),
+            wspf_10_cmf_cstlabour = vFormPanel.getFldValue('wspf_10_cmf_cstlabour'),
+            wspf_10_cmf_cstmaterial = vFormPanel.getFldValue('wspf_10_cmf_cstmaterial'),
+            wspf_10_cmf_cstother = vFormPanel.getFldValue('wspf_10_cmf_cstother'),
+            wspf_10_cmf_csttotal = vFormPanel.getFldValue('wspf_10_cmf_csttotal'),
+            wspf_10_cmf_invres = vFormPanel.getFldValue('wspf_10_cmf_invres'),
+            wspf_10_cmf_investhrs = vFormPanel.getFldValue('wspf_10_cmf_investhrs'),
+            wspf_10_cmf_invextcosts = vFormPanel.getFldValue('wspf_10_cmf_invextcosts'),
+            wspf_10_cmf_riskops = vFormPanel.getFldValue('wspf_10_cmf_riskops'),
+            wspf_10_cmf_riskasset = vFormPanel.getFldValue('wspf_10_cmf_riskasset'),
+            wspf_10_cmf_risksafety = vFormPanel.getFldValue('wspf_10_cmf_risksafety'),
+            wspf_10_cmf_riskenviro = vFormPanel.getFldValue('wspf_10_cmf_riskenviro'),
+            wspf_10_cmf_riskstrat = vFormPanel.getFldValue('wspf_10_cmf_riskstrat'),
+            wspf_10_cmf_risktotal = vFormPanel.getFldValue('wspf_10_cmf_risktotal'),
+            wspf_10_cmf_riskcomm = vFormPanel.getFldValue('wspf_10_cmf_riskcomm');
+
+          Ext.create('Ext.window.Window', {
+            title: 'Change Management Form',
+            modal: true,
+            autoShow: true,
+            bodyStyle: {
+              "background-color": "#f0f0f0"
+            },
+            height: 750,
+            scrollable: 'true',
+            width: 1038,
+            bodyPadding: 3,
+            maximizable: true,
+            defaults: {
+              bodyPadding: 4,
+            },
+            items: [{
+                xtype: 'fieldcontainer',
+                height: 50,
+                minWidth: 1000,
+                fieldLabel: '',
+                layout: {
+                  type: 'hbox',
+                  align: 'stretch',
+                  padding: 3
+                },
+                items: [{
+                    xtype: 'textfield',
+                    flex: 1,
+                    maxHeight: 30,
+                    minWidth: 100,
+                    labelStyle: 'font-weight:bold;',
+                    fieldLabel: 'CAR (Number)',
+                    name: 'vwspf_10_cmf_car'
+
+                  },
+                  {
+                    xtype: 'checkboxfield',
+                    flex: 1,
+                    fieldLabel: '',
+                    labelStyle: 'font-weight:bold;',
+                    boxLabel: 'Temporary Modification',
+                    name: 'vwspf_10_cmf_tempmodchbx'
+
+                  },
+                  {
+                    xtype: 'checkboxfield',
+                    flex: 1,
+                    fieldLabel: '',
+                    labelStyle: 'font-weight:bold;',
+                    boxLabel: 'Permanent Modification',
+                    name: 'vwspf_10_cmf_permmodchbx'
+
+                  },
+                  {
+                    xtype: 'checkboxfield',
+                    flex: 1,
+                    fieldLabel: '',
+                    labelStyle: 'font-weight:bold;',
+                    boxLabel: 'Engineering Investigation',
+                    name: 'vwspf_10_cmf_enginvchbx'
+
+                  }
+                ]
+              },
+              {
+                xtype: 'fieldcontainer',
+                height: '',
+                minWidth: 1000,
+                width: 1000,
+                layout: 'vbox',
+                fieldLabel: '',
+                defaults: {
+                  height: 120,
+                  width: 900,
+                  labelWidth: 200,
+                  flex: 1,
+                  labelStyle: 'font-weight:bold;',
+                  xtype: 'textareafield'
+                },
+                items: [{
+                    fieldLabel: 'Statement of Need/Benefit/ Reasons/Risks in this Project',
+                    emptyText: '(What does the project want to achieve)',
+                    name: 'vwspf_10_cmf_need'
+                  },
+                  {
+                    fieldLabel: 'Aims/Objectives',
+                    emptyText: '(What issue does this project aim to address – what is the problem?)',
+                    name: 'vwspf_10_cmf_aims'
+
+                  },
+                  {
+                    fieldLabel: 'Return on Investment /Payback Period / Justification',
+                    emptyText: '(Why are we doing this project?)',
+                    name: 'vwspf_10_cmf_roi'
+
+                  },
+                  {
+                    fieldLabel: 'Indicative Schedule & Resources to be used',
+                    name: 'vwspf_10_cmf_indschedres'
+
+                  },
+                  {
+                    fieldLabel: 'Interface/Relevant Stakeholders',
+                    emptyText: '(List of stakeholder who need to be involved)',
+                    name: 'vwspf_10_cmf_stakeholders'
+
+                  },
+                  {
+                    fieldLabel: 'Analysis of Options/Engineering Investigation/ Suggested Option',
+                    emptyText: '(Summary of Engineering Investigation Actions,  if one has been performed)',
+                    name: 'vwspf_10_cmf_engsummary'
+
+                  }
+                ]
+              },
+              {
+                xtype: 'fieldcontainer',
+                padding: 10,
+                width: 1038,
+                fieldLabel: 'Indicative Total Project Cost  \n(If not known state as unknown)',
+                labelStyle: 'font-weight:bold;',
+                layout: {
+                  type: 'hbox',
+                  align: 'stretch',
+                  padding: 10,
+                  bodypadding: 4
+                },
+                defaults: {
+                  xtype: 'numberfield',
+                  labelStyle: 'font-weight:bold;',
+                  flex: 1,
+                  maxWidth: 200
+                },
+
+
+                items: [{
+                    fieldLabel: 'Labour $',
+                    name: 'vwspf_10_cmf_cstlabour'
+
+                  },
+                  {
+                    fieldLabel: 'Material $',
+                    name: 'vwspf_10_cmf_cstmaterial'
+
+                  },
+                  {
+                    fieldLabel: 'Other $',
+                    name: 'vwspf_10_cmf_cstother'
+
+                  },
+                  {
+                    fieldLabel: 'Total',
+                    name: 'vwspf_10_cmf_csttotal'
+
+                  }
+                ]
+              },
+              {
+                xtype: 'fieldcontainer',
+                height: 125,
+                padding: 4,
+                labelStyle: 'font-weight:bold;',
+                fieldLabel: 'Initial Concept phase / Engineering Investigation Cost',
+                layout: {
+                  type: 'hbox',
+                  padding: 4,
+                  bodypadding: 4
+                },
+                defaults: {
+                  xtype: 'textareafield',
+                  flex: 1,
+                  labelStyle: 'font-weight:bold;',
+                  width: 275,
+                  height: 120,
+                  labelWidth: 60
+                },
+
+                items: [{
+                    fieldLabel: 'Resources (List)',
+                    emptyText: '1: \n2: \n3:',
+                    name: 'vwspf_10_cmf_invres'
+
+                  },
+                  {
+                    fieldLabel: 'Estimate Hours',
+                    emptyText: '1: \n2: \n3:',
+                    name: 'vwspf_10_cmf_investhrs'
+
+                  },
+                  {
+                    fieldLabel: 'External Costs',
+                    emptyText: '(Company)',
+                    name: 'vwspf_10_cmf_invextcosts'
+
+                  }
+                ],
+              },
+
+              {
+                xtype: 'fieldcontainer',
+                height: 50,
+                minWidth: 1000,
+                fieldLabel: 'Risk evaluation',
+                labelStyle: 'font-weight:bold;',
+                layout: {
+                  type: 'hbox',
+                  align: 'stretch',
+                  padding: 4
+                },
+                defaults: {
+                  labelStyle: 'font-weight:bold;',
+                  xtype: 'checkboxfield',
+                  flex: 1,
+                  padding: 4,
+                  fieldLabel: '',
+                  labelWidth: 40
+                },
+                items: [{
+                    boxLabel: 'Operational',
+                    name: 'vwspf_10_cmf_riskops'
+
+                  },
+                  {
+                    boxLabel: 'Asset',
+                    name: 'vwspf_10_cmf_riskasset'
+
+                  },
+                  {
+                    boxLabel: 'Safety',
+                    name: 'vwspf_10_cmf_risksafety'
+
+                  },
+                  {
+                    boxLabel: 'Environment',
+                    name: 'vwspf_10_cmf_riskenviro'
+
+                  },
+                  {
+                    boxLabel: 'Strategic',
+                    name: 'vwspf_10_cmf_riskstrat'
+
+                  }
+                ]
+              },
+
+              {
+                xtype: 'fieldcontainer',
+                height: '',
+                minWidth: 1000,
+                width: 1000,
+                layout: 'vbox',
+                fieldLabel: '',
+                defaults: {
+                  height: 120,
+                  labelStyle: 'font-weight:bold;',
+                  width: 900,
+                  labelWidth: 200,
+                  flex: 1,
+                  xtype: 'textareafield'
+                },
+                items: [{
+                    xtype: 'numberfield',
+                    fieldLabel: 'Overall risk rating',
+                    height: 40,
+                    emptyText: '  (Assign Priority via Risk Ranking Colour)',
+                    name: 'vwspf_10_cmf_risktotal'
+
+                  },
+                  {
+                    fieldLabel: 'Risk Rating Comments',
+                    emptyText: '(What issue does this project aim to address – what is the problem?)',
+                    name: 'vwspf_10_cmf_riskcomm'
+
+                  }
+                ],
+              }
+            ],
+            buttons: [{
+              text: 'submit',
+              formBind: true,
+              handler: function(btn) {
+                var win = btn.up('window'),
+                  form = win.down('form'),
+                  values = form.getValues();
+                vFormPanel.setFldValue('wspf_10_cmf_reqbrief', values.vwspf_10_cmf_reqbrief, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_car', values.vwspf_10_cmf_car, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_tempmodchbx', values.vwspf_10_cmf_tempmodchbx, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_permmodchbx', values.vwspf_10_cmf_permmodchbx, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_enginvchbx', values.vwspf_10_cmf_enginvchbx, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_need', values.vwspf_10_cmf_need, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_aims', values.vwspf_10_cmf_aims, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_roi', values.vwspf_10_cmf_roi, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_indschedres', values.vwspf_10_cmf_indschedres, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_stakeholders', values.vwspf_10_cmf_stakeholders, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_engsummary', values.vwspf_10_cmf_engsummary, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_cstlabour', values.vwspf_10_cmf_cstlabour, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_cstmaterial', values.vwspf_10_cmf_cstmaterial, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_cstother', values.vwspf_10_cmf_cstother, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_csttotal', values.vwspf_10_cmf_csttotal, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_invres', values.vwspf_10_cmf_invres, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_investhrs', values.vwspf_10_cmf_investhrs, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_invextcosts', values.vwspf_10_cmf_invextcosts, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_riskops', values.vwspf_10_cmf_riskops, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_riskasset', values.vwspf_10_cmf_riskasset, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_risksafety', values.vwspf_10_cmf_risksafety, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_riskenviro', values.vwspf_10_cmf_riskenviro, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_riskstrat', values.vwspf_10_cmf_riskstrat, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_risktotal', values.vwspf_10_cmf_risktotal, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_riskcomm', values.vwspf_10_cmf_riskcomm, true);
+                win.close();
+              }
+            }]
+          }).show();
+        }
+      }
+    }, {
+      '[extensibleFramework] [tabName=HDR][isTabView=true] [name=wspf_10_cmf_chappr]': {
+        blur: function(field, lastValues) {
+          var vFormPanel = EAM.Utils.getCurrentTab().getFormPanel(),
+            wspf_10_cmf_eicomm = vFormPanel.getFldValue('wspf_10_cmf_eicomm'),
+            wspf_10_cmf_mechcomm = vFormPanel.getFldValue('wspf_10_cmf_mechcomm'),
+            wspf_10_cmf_plantcomm = vFormPanel.getFldValue('wspf_10_cmf_plantcomm'),
+            wspf_10_cmf_safecomm = vFormPanel.getFldValue('wspf_10_cmf_safecomm'),
+            wspf_10_cmf_mancomm = vFormPanel.getFldValue('wspf_10_cmf_mancomm'),
+            wspf_10_cmf_owner = vFormPanel.getFldValue('wspf_10_cmf_owner'),
+            wspf_10_cmf_invappcst = vFormPanel.getFldValue('wspf_10_cmf_invappcst'),
+            wspf_10_cmf_engauth = vFormPanel.getFldValue('wspf_10_cmf_engauth'),
+            wspf_10_cmf_extengreview = vFormPanel.getFldValue('wspf_10_cmf_extengreview'),
+            wspf_10_cmf_custrep = vFormPanel.getFldValue('wspf_10_cmf_custrep'),
+            wspf_10_cmf_chflow = vFormPanel.getFldValue('wspf_10_cmf_chflow');
+
+          Ext.create('Ext.window.Window', {
+            title: 'Change Management Approval',
+            modal: true,
+            autoShow: true,
+            bodyStyle: {
+              "background-color": "#f0f0f0"
+            },
+            height: 750,
+            scrollable: 'true',
+            width: 1038,
+            bodyPadding: 4,
+            maximizable: true,
+            defaults: {
+              bodyPadding: 4,
+            },
+            items: [{
+                xtype: 'fieldcontainer',
+                minWidth: 1000,
+                layout: 'vbox',
+                fieldLabel: '',
+                defaults: {
+                  height: 60,
+                  width: 900,
+                  labelWidth: 160,
+                  flex: 1,
+                  labelStyle: 'font-weight:bold;',
+                  xtype: 'textareafield'
+                },
+                items: [{
+                    fieldLabel: 'Senior Electrical Engineer\nApproval Comments',
+                    name: 'vwspf_10_cmf_eicomm',
+                  },
+                  {
+                    fieldLabel: 'Senior Mechanical Engineer\nApproval Comments',
+                    name: 'vwspf_10_cmf_mechcomm',
+                  },
+                  {
+                    fieldLabel: 'Plant Operations Manager\nApproval Comments',
+                    name: 'vwspf_10_cmf_plantcomm',
+                  },
+                  {
+                    fieldLabel: 'Safety\nApproval Comments',
+                    name: 'vwspf_10_cmf_safecomm',
+                  },
+                  {
+                    fieldLabel: 'Management Approval\nApproval Comments',
+                    name: 'vwspf_10_cmf_mancomm',
+                  }
+                ]
+              },
+              {
+                xtype: 'fieldcontainer',
+                layout: 'vbox',
+                minWidth: 1000,
+                fieldLabel: '',
+                defaults: {
+                  height: 40,
+                  width: 900,
+                  labelWidth: 100,
+                  labelStyle: 'font-weight:bold;',
+                  xtype: 'textfield'
+                },
+                items: [{
+                    fieldLabel: 'Project Manager',
+                    name: 'vwspf_10_cmf_owner',
+                  },
+                  {
+                    xtype: 'numericfield',
+                    fieldLabel: 'Approved $ for Concept Phase\n/Engineering Investigation',
+                    name: 'vwspf_10_cmf_invappcst',
+                  },
+                  {
+                    fieldLabel: 'Assigned Engineering Authority',
+                    name: 'vwspf_10_cmf_engauth',
+                  },
+                  {
+                    fieldLabel: 'Assigned External Engineering Review',
+                    name: 'vwspf_10_cmf_extengreview',
+                  },
+                  {
+                    fieldLabel: 'Assigned Customer Representative',
+                    name: 'vwspf_10_cmf_custrep',
+                  },
+                  {
+                  xtype: 'combobox',
+                    fieldLabel: 'Select Route',
+                    store: '[\'1. Start engineering investigation\',\'2. Proceed to Concept\',\'3. Proceed to implementation\',\'4. Cancel\']',
+                    name: 'vwspf_10_cmf_chflow',
+                  }
+                ],
+              }
+
+            ],
+            buttons: [{
+              text: 'submit',
+              formBind: true,
+              handler: function(btn) {
+                var win = btn.up('window'),
+                  form = win.down('form'),
+                  values = form.getValues();
+                vFormPanel.setFldValue('wspf_10_cmf_eicomm', values.vwspf_10_cmf_eicomm, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_mechcomm', values.vwspf_10_cmf_mechcomm, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_plantcomm', values.vwspf_10_cmf_plantcomm, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_safecomm', values.vwspf_10_cmf_safecomm, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_mancomm', values.vwspf_10_cmf_mancomm, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_owner', values.vwspf_10_cmf_owner, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_invappcst', values.vwspf_10_cmf_invappcst, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_engauth', values.vwspf_10_cmf_engauth, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_extengreview', values.vwspf_10_cmf_extengreview, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_custrep', values.vwspf_10_cmf_custrep, true),
+                  vFormPanel.setFldValue('wspf_10_cmf_chflow', values.vwspf_10_cmf_chflow, true);
+                win.close();
+              }
+            }]
+          }).show();
+        }
+      }
+    };
+  }
+})

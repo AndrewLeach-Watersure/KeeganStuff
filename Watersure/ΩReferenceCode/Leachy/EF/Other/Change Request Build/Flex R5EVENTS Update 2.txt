@@ -1,0 +1,84 @@
+*************************************
+A.L.
+Change Request Work Flow 
+Work Order side of things.
+**************************************
+
+
+DECLARE
+  @v_id   integer,
+  @user   nvarchar(100),
+  @snew   nvarchar(4),
+  @sdesc  nvarchar(80),
+  @sold   nvarchar(4),
+  @type   nvarchar(8),
+  @changeStatus nvarchar(30),
+  @wo nvarchar(24),
+  @grp    nvarchar(12);
+EXECUTE @v_id = O7SESS_CUR_USER @user OUTPUT;
+
+BEGIN
+  SELECT 
+@wo = evt_code,
+@sold=evt_udfchar06, 
+@type=evt_jobtype, 
+@snew=evt_status 
+FROM r5events 
+WHERE evt_sqlidentity=:rowid;
+
+SELECT 
+@grp=uog_group 
+FROM r5userorganization 
+WHERE uog_user=@user;
+
+SELECT
+@changeStatus = CMF_STATUS
+FROM U5CHMGMT WHERE CMF_EVENT = @wo;
+ 
+IF (@type = 'CMCH' AND @sold = 'RQST' AND @snew = 'CHRV')
+BEGIN 
+IF TRIGGER_NESTLEVEL() > 7
+RETURN
+UPDATE U5CHMGMT
+SET CMF_STATUS = 'Change Review (4 Pillars)' WHERE CMF_EVENT = @wo;
+END
+IF (@type = 'CMCH' AND @sold IN ('INPR','PLAN') AND @snew = 'CHRV' AND (@changeStatus = 'Engineering Investigation' OR @changeStatus = 'Change Request'))
+BEGIN
+IF TRIGGER_NESTLEVEL() > 7
+RETURN
+UPDATE U5CHMGMT
+SET CMF_STATUS = 'Change Review (4 Pillars)',
+CMF_EICOMMCHECK = CMF_EICOMM,
+CMF_EICOMM = NULL,
+CMF_MECHCOMMCHECK = CMF_MECHCOMM,
+CMF_MECHCOMM = NULL,
+CMF_PLANTCOMMCHECK = CMF_PLANTCOMM,
+CMF_PLANTCOMM = NULL,
+CMF_SAFECOMMCHECK = CMF_SAFECOMM,
+CMF_SAFECOMM = NULL,
+CMF_MANCOMMCHECK = CMF_MANCOMM,
+CMF_MANCOMM = NULL
+WHERE CMF_EVENT = @wo;
+END
+IF (@type = 'CMCH' AND @sold IN ('CHCD') AND @snew = 'CHRV')
+BEGIN
+IF TRIGGER_NESTLEVEL() > 7
+RETURN
+UPDATE U5CHMGMT
+SET CMF_STATUS = 'Concept Review (3 Pillars)' WHERE CMF_EVENT = @wo;
+END
+IF (@type = 'CMCH' AND @sold IN ('CHDD') AND @snew = 'CHRV')
+BEGIN
+IF TRIGGER_NESTLEVEL() > 7
+RETURN
+UPDATE U5CHMGMT
+SET CMF_STATUS = 'Detail Design Review (3 Pillars)' WHERE CMF_EVENT = @wo;
+END
+IF (@type IN  ('EMPM','EMTM') AND @sold IN ('INPR') AND @snew = 'CLOS' AND @changeStatus IS NOT NULL)
+BEGIN
+IF TRIGGER_NESTLEVEL() > 7
+RETURN
+UPDATE U5CHMGMT
+SET CMF_STATUS = 'Implementation Sign Off' WHERE CMF_EVENT = @wo;
+END
+END

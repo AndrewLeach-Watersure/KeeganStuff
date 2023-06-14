@@ -1,0 +1,151 @@
+Ext.define('EAM.custom.external_UUCHV2', {
+  extend: 'EAM.custom.AbstractExtensibleFramework',
+  getSelectors: function() {
+    return {
+      '[extensibleFramework] [tabName=HDR][isTabView=true] [name=wspf_10_cha_need]': {
+        focus: function(field, lastValues) {
+          EAM.Utils.debugMessage('Focus');
+          var vFormPanel = EAM.Utils.getCurrentTab().getFormPanel(),
+            vFieldValue = vFormPanel.getFldValue('wspf_10_cha_need');
+          console.log('after Form Panel');
+          vFormPanel.setFldValue('wspf_10_description', 'Who is your god now?', true);
+        }
+      },
+      '[extensibleFramework] [tabName=HDR][isTabView=true] [name=wspf_10_cha_event]': {
+        blur: function(field, lastValues) {
+          var vFormPanel = EAM.Utils.getCurrentTab().getFormPanel(),
+            wspf_10_cha_need = vFormPanel.getFldValue('wspf_10_cha_need');
+
+Ext.create('Ext.window.Window', {
+  title: 'Change Management Form',
+  layout: 'fit',
+  width: 900,
+  minWidth: 250,
+  height: 800,
+  closable: true,
+  animCollapse: false,
+  border: true,
+  modal: true,
+
+  padding: 5,
+  items: [{
+    xtype: 'form',
+    bodyPadding: 15,
+    title: 'My Fields',
+    scrollable: true,
+    items: [{
+      xtype: 'container',
+      bodyPadding: 5,
+      layout: {
+        type: 'vbox',
+        scrollable: true,
+        align: 'stretch'
+      },
+      items: [{
+          xtype: 'container',
+          bodyPadding: 5,
+          referenceHolder: true,
+          scrollable: true,
+          flex: 1,
+
+          layout: {
+            type: 'hbox',
+            bodyPadding: 5,
+            scrollable: true,
+            align: 'stretch'
+          },
+          items: [{
+              xtype: 'textfield',
+              bodyPadding: 5,
+              fieldLabel: 'Label'
+            },
+            {
+              xtype: 'checkboxfield',
+              bodyPadding: 5,
+              fieldLabel: 'Label',
+              boxLabel: 'Box Label'
+            },
+            {
+              xtype: 'checkboxfield',
+              bodyPadding: 5,
+              flex: 1,
+              fieldLabel: 'Label',
+              boxLabel: 'Box Label'
+            },
+            {
+              xtype: 'checkboxfield',
+              bodyPadding: 5,
+              flex: 1,
+              fieldLabel: 'Label',
+              boxLabel: 'Box Label'
+            }
+          ]
+        },
+        {
+          xtype: 'textareafield',
+          bodyPadding: 5,
+          flex: 1,
+          height: 250,
+          fieldLabel: 'Statement of Need/Benefit/ Reasons/Risks in this Project',
+          value: wspf_10_cha_need,
+          name: 'vwspf_10_cha_need',
+          reference: 'vwspf_10_cha_need',
+        },
+        {
+          xtype: 'textareafield',
+          bodyPadding: 5,
+          flex: 1,
+          fieldLabel: 'Aims/Objectives'
+        },
+        {
+          xtype: 'textareafield',
+          bodyPadding: 5,
+          flex: 1,
+          fieldLabel: 'Return on Investment /Payback Period / Justification'
+        },
+        {
+          xtype: 'textareafield',
+          bodyPadding: 5,
+          flex: 1,
+          height: 172,
+          fieldLabel: 'Indicative Schedule & Resources to be used'
+        },
+        {
+          xtype: 'textareafield',
+          bodyPadding: 5,
+          flex: 1,
+          fieldLabel: 'Interface/Relevant Stakeholders'
+        },
+        {
+          xtype: 'textareafield',
+          bodyPadding: 5,
+          flex: 1,
+          fieldLabel: 'Analysis of Options/Engineering Investigation/ Suggested Option'
+        }
+      ]
+
+    }]
+
+  }],
+  buttons: [{
+    text: 'submit',
+    formBind: true,
+    handler: function(btn){
+    var win = btn.up('window'),
+        form = win.down('form'),
+        values = form.getValues();
+    console.log(values.vwspf_10_cha_need);
+    vFormPanel.setFldValue('wspf_10_cha_need', values.vwspf_10_cha_need, true);
+    win.close();
+
+}
+  }]
+
+}).show();
+
+        }
+
+      }
+    }
+  }
+});

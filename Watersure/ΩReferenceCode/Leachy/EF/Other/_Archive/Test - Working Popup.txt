@@ -1,0 +1,198 @@
+Ext.define('EAM.custom.external_UUCHV2', {
+  extend: 'EAM.custom.AbstractExtensibleFramework',
+  getSelectors: function() {
+    return {
+      '[extensibleFramework] [tabName=HDR][isTabView=true] [name=wspf_10_cha_need]': {
+        focus: function(field, lastValues) {
+          EAM.Utils.debugMessage('Focus');
+          var vFormPanel = EAM.Utils.getCurrentTab().getFormPanel(),
+            vFieldValue = vFormPanel.getFldValue('wspf_10_cha_need');
+          console.log('after Form Panel');
+          vFormPanel.setFldValue('wspf_10_description', 'Who is your god now?', true);
+        }
+      },
+      '[extensibleFramework] [tabName=HDR][isTabView=true] [name=wspf_10_cha_event]': {
+        blur: function(field, lastValues) {
+          var vFormPanel = EAM.Utils.getCurrentTab().getFormPanel(),
+            wspf_10_cha_need = vFormPanel.getFldValue('wspf_10_cha_need');
+
+          Ext.create('Ext.window.Window', {
+            title: 'Change Management Form',
+            modal: true,
+            autoShow: true,
+            height: 750,
+            scrollable: 'true',
+            width: 1038,
+            bodyPadding: 3,
+            maximizable: true,
+            defaults: {
+              bodyPadding: 4
+            },
+            items: [{
+                xtype: 'fieldcontainer',
+                height: 50,
+                minWidth: 1000,
+                fieldLabel: '',
+                layout: {
+                  type: 'hbox',
+                  align: 'stretch',
+                  padding: 3
+                },
+                items: [{
+                    xtype: 'textfield',
+                    flex: 1,
+                    maxHeight: 30,
+                    minWidth: 100,
+                    fieldLabel: 'CAR (Number)'
+                  },
+                  {
+                    xtype: 'checkboxfield',
+                    flex: 1,
+                    fieldLabel: '',
+                    boxLabel: 'Temporary Modification'
+                  },
+                  {
+                    xtype: 'checkboxfield',
+                    flex: 1,
+                    fieldLabel: '',
+                    boxLabel: 'Permanent Modification'
+                  },
+                  {
+                    xtype: 'checkboxfield',
+                    flex: 1,
+                    fieldLabel: '',
+                    boxLabel: 'Engineering Investigation'
+                  }
+                ]
+              },
+              {
+                xtype: 'fieldcontainer',
+                height: '',
+                minWidth: 1000,
+                width: 1000,
+                layout: 'vbox',
+                fieldLabel: '',
+                defaults: {
+                  height: 120,
+                  width: 900,
+                  labelWidth: 200,
+                  flex: 1,
+                  xtype: 'textareafield'
+                },
+                items: [{
+                    fieldLabel: 'Statement of Need/Benefit/ Reasons/Risks in this Project',
+                    emptyText: '(What does the project want to achieve)',
+                    name: 'vwspf_10_cha_need'
+                  },
+                  {
+                    fieldLabel: 'Aims/Objectives',
+                    emptyText: '(What issue does this project aim to address – what is the problem?)'
+                  },
+                  {
+                    fieldLabel: 'Return on Investment /Payback Period / Justification',
+                    emptyText: '(Why are we doing this project?)'
+                  },
+                  {
+                    fieldLabel: 'Indicative Schedule & Resources to be used',
+                  },
+                  {
+                    fieldLabel: 'Interface/Relevant Stakeholders',
+                    emptyText: '(List of stakeholder who need to be involved)'
+                  },
+                  {
+                    fieldLabel: 'Analysis of Options/Engineering Investigation/ Suggested Option',
+                    emptyText: '(Summary of Engineering Investigation Actions,  if one has been performed)'
+                  }
+                ]
+              },
+              {
+                xtype: 'fieldcontainer',
+                padding: 4,
+                width: 1038,
+                fieldLabel: 'Indicative Total Project Cost  (If not known state as unknown)',
+                layout: {
+                  type: 'hbox',
+                  align: 'stretch',
+                  padding: 10,
+                  bodypadding: 4
+                },
+                defaults: {
+                  xtype: 'numberfield',
+                  flex: 1,
+                  maxWidth: 200
+                },
+
+
+                items: [{
+                    fieldLabel: 'Labour $'
+                  },
+                  {
+                    fieldLabel: 'Material $',
+                  },
+                  {
+                    fieldLabel: 'Other $',
+                  },
+                  {
+                    fieldLabel: 'Total'
+                  }
+                ]
+              },
+              {
+                xtype: 'fieldcontainer',
+                height: 120,
+                padding: 4,
+                width: 1038,
+                fieldLabel: 'Initial Concept phase / Engineering Investigation Cost',
+                layout: {
+                  type: 'hbox',
+                  align: 'stretch',
+                  padding: 4,
+                  bodypadding: 4
+                },
+                defaults: {
+                  xtype: 'textareafield',
+                  flex: 1,
+                  maxWidth: 300,
+                  height: 120,
+                  labelWidth: 60
+                },
+
+
+                items: [{
+                    fieldLabel: 'Resources (List)',
+                    emptyText: '1: \n2: \n3:'
+                  },
+                  {
+                    fieldLabel: 'Estimate Hours',
+                    emptyText: '1: \n2: \n3:'
+                  },
+                  {
+                    fieldLabel: 'External Costs',
+                    emptyText: '(Company)'
+                  }
+
+                ]
+              }
+
+            ],
+
+            buttons: [{
+              text: 'submit',
+              formBind: true,
+              handler: function(btn) {
+                var win = btn.up('window'),
+                  form = win.down('form'),
+                  values = form.getValues();
+                console.log(values.vwspf_10_cha_need);
+                vFormPanel.setFldValue('wspf_10_cha_need', values.vwspf_10_cha_need, true);
+                win.close();
+
+              }
+            }]
+
+          }).show();
+        }
+      }
+    };
+  }
+})

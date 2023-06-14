@@ -1,0 +1,11 @@
+DataCatalog
+Secret key:	Xk.-SlgOEiwxzAiUpFlh
+Consumer Key:	.-QJOYseDEvPQI6kwGZN
+
+IONAPITokenForIONServices
+Secret key:	INQr8An_8v6TuyyLY1Gd
+Consumer Key:	Us-YIGBkO1diOrqWqJi5
+
+AuthorizationServer
+Secret key:	6VWe~OyLV46yOhfCdL8u
+Consumer Key:	9ku1kZ1woOggA3oseu2c

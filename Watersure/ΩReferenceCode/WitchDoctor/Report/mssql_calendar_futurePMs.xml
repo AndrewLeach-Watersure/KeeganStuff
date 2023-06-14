@@ -1,0 +1,773 @@
+<report xmlns="http://developer.cognos.com/schemas/report/8.0/" expressionLocale="en"><!--RSU-SPC-0093 The report specification was upgraded from &amp;amp;amp;amp;amp;amp;quot;http://developer.cognos.com/schemas/report/6.0/&amp;amp;amp;amp;amp;amp;quot; to &amp;amp;amp;amp;amp;amp;quot;http://developer.cognos.com/schemas/report/8.0/&amp;amp;amp;amp;amp;amp;quot; at 2014-3-19. 22:15:33-->
+				<modelPath>/content/package[@name='Infor10EAMPackage_1012']/model[@name='model']</modelPath>
+				<drillBehavior modelBasedDrillThru="true"/>
+				<queries>
+					<query name="calendar">
+						<source>
+							
+						<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>
+select mnth, DMNTH,Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
+
+FROM
+
+(SELECT mnth, Dmnth
+
+FROM
+
+(select  substring(dbo.repgetcompdate(convert(datetime, #prompt('SEL_START')# , 120)),1,7) mnth , datename( mm, convert(datetime, #prompt('SEL_START')# , 120)) Dmnth, convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120)  DY from dual
+union select   substring(dbo.repgetcompdate(dateadd(mm,1,convert(datetime, #prompt('SEL_START')# , 120))),1,7), datename( mm, dateadd(mm,1,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,1,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))   from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,2,convert(datetime, #prompt('SEL_START')# , 120))),1,7) ,  datename( mm, dateadd(mm,2,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,2,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,3,convert(datetime, #prompt('SEL_START')# , 120))),1,7) ,  datename( mm, dateadd(mm,3,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,3,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))   from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,4,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,4,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,4,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,5,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,5,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,5,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual
+union select   substring(dbo.repgetcompdate(dateadd(mm,6,convert(datetime, #prompt('SEL_START')# , 120))),1,7)   ,  datename( mm, dateadd(mm,6,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,6,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))   from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,7,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,7,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,7,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))  from dual
+union select   substring(dbo.repgetcompdate(dateadd(mm,8,convert(datetime, #prompt('SEL_START')# , 120))),1,7) ,  datename( mm, dateadd(mm,8,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,8,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))   from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,9,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,9,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,9,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,10,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,10,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,10,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,11,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,11,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,11,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual ) AA
+WHERE  DY  &lt;= dateadd(mm,#prompt('NO_MONTHS')# - 1,convert(datetime, #prompt('SEL_START')# , 120))
+) MOY,
+
+(select Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday,
+substring(dbo.repgetcompdate(Sunday),1,7) SunMonth ,
+substring(dbo.repgetcompdate(Saturday),1,7)  SatMonth
+
+from
+(select 
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) Sunday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1))+ 1 Monday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) + 2 Tuesday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) + 3 Wednesday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) + 4 Thursday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) + 5 Friday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) + 6 Saturday 
+from dual, 
+(select 1 wk from dual union select 2  from dual union select 3  from dual union 
+select 4  from dual union select 5  from dual union select 6  from dual union
+select 7  from dual union select 8  from dual union select 9  from dual union
+select 10  from dual union select 11  from dual union select 12  from dual union
+select 13  from dual union select 14  from dual union select 15  from dual union
+select 16  from dual union select 17  from dual union select 18  from dual union
+select 19  from dual union select 20  from dual union select 21  from dual union 
+select 22  from dual union select 23  from dual union select 24  from dual union
+select 25  from dual union select 26  from dual union select 27  from dual union
+select 28  from dual union select 29  from dual union select 30  from dual union
+select 31  from dual union select 32  from dual union select 33  from dual union 
+select 34  from dual union select 35  from dual union select 36  from dual union 
+select 37  from dual union select 38  from dual union select 39  from dual union 
+select 40  from dual union select 41  from dual union select 42  from dual union 
+select 43  from dual union select 44  from dual union select 45  from dual union 
+select 46  from dual union select 47  from dual union select 48  from dual union 
+select 49  from dual union select 50  from dual union select 51  from dual union 
+select 52  from dual union select 53  from dual  ) a
+)b
+ ) WOY
+
+WHERE MNTH = SunMonth OR MNTH = SatMonth
+
+
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="mnth"/><mdProjectedItem name="DMNTH"/><mdProjectedItem name="Sunday"/><mdProjectedItem name="Monday"/><mdProjectedItem name="Tuesday"/><mdProjectedItem name="Wednesday"/><mdProjectedItem name="Thursday"/><mdProjectedItem name="Friday"/><mdProjectedItem name="Saturday"/></mdProjectedItems></sqlQuery></source>
+						<selection><dataItem name="sunmon"><expression>substring ( REPGETCOMPDATE ( [Sunday] ), 1, 7)</expression></dataItem><dataItem name="monmon"><expression>substring ( REPGETCOMPDATE ([Monday] ), 1, 7)</expression></dataItem><dataItem name="tuemon"><expression>substring ( REPGETCOMPDATE ([Tuesday] ), 1, 7)</expression></dataItem><dataItem name="wedmon"><expression>substring ( REPGETCOMPDATE ( [Wednesday] ), 1, 7)</expression></dataItem><dataItem name="thrmon"><expression>substring ( REPGETCOMPDATE ( [Thursday] ), 1, 7)</expression></dataItem><dataItem name="frimon"><expression>substring ( REPGETCOMPDATE ( [Friday] ), 1, 7)</expression></dataItem><dataItem name="satmon"><expression>substring ( REPGETCOMPDATE ( [Saturday] ), 1, 7)</expression></dataItem><dataItem name="mnth"><expression>[SQL1].[mnth]</expression></dataItem><dataItem name="DMNTH"><expression>[SQL1].[DMNTH]</expression></dataItem><dataItem name="Sunday"><expression>[SQL1].[Sunday]</expression></dataItem><dataItem name="Monday"><expression>[SQL1].[Monday]</expression></dataItem><dataItem name="Tuesday"><expression>[SQL1].[Tuesday]</expression></dataItem><dataItem name="Wednesday"><expression>[SQL1].[Wednesday]</expression></dataItem><dataItem name="Thursday"><expression>[SQL1].[Thursday]</expression></dataItem><dataItem name="Friday"><expression>[SQL1].[Friday]</expression></dataItem><dataItem name="Saturday"><expression>[SQL1].[Saturday]</expression></dataItem></selection>
+					</query>
+				<query name="page set">
+						<source>
+							
+						<sqlQuery dataSource="AdvRepData" name="SQL1">
+			<sqlText>
+select mnth, DMNTH,Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
+
+FROM
+
+(SELECT mnth, Dmnth
+
+FROM
+
+(select  substring(dbo.repgetcompdate(convert(datetime, #prompt('SEL_START')# , 120)),1,7) mnth , datename( mm, convert(datetime, #prompt('SEL_START')# , 120)) Dmnth, convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120)  DY from dual
+union select   substring(dbo.repgetcompdate(dateadd(mm,1,convert(datetime, #prompt('SEL_START')# , 120))),1,7), datename( mm, dateadd(mm,1,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,1,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))   from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,2,convert(datetime, #prompt('SEL_START')# , 120))),1,7) ,  datename( mm, dateadd(mm,2,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,2,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,3,convert(datetime, #prompt('SEL_START')# , 120))),1,7) ,  datename( mm, dateadd(mm,3,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,3,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))   from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,4,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,4,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,4,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,5,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,5,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,5,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual
+union select   substring(dbo.repgetcompdate(dateadd(mm,6,convert(datetime, #prompt('SEL_START')# , 120))),1,7)   ,  datename( mm, dateadd(mm,6,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,6,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))   from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,7,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,7,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,7,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))  from dual
+union select   substring(dbo.repgetcompdate(dateadd(mm,8,convert(datetime, #prompt('SEL_START')# , 120))),1,7) ,  datename( mm, dateadd(mm,8,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,8,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))   from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,9,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,9,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,9,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,10,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,10,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,10,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual 
+union select   substring(dbo.repgetcompdate(dateadd(mm,11,convert(datetime, #prompt('SEL_START')# , 120))),1,7)  ,  datename( mm, dateadd(mm,11,convert(datetime, #prompt('SEL_START')# , 120))), dateadd(mm,11,  convert(datetime, substring(#prompt('SEL_START')# ,1,8) + '01',120))    from dual ) AA
+WHERE  DY  &lt;= dateadd(mm,#prompt('NO_MONTHS')# - 1,convert(datetime, #prompt('SEL_START')# , 120))
+) MOY,
+
+(select Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday,
+substring(dbo.repgetcompdate(Sunday),1,7) SunMonth ,
+substring(dbo.repgetcompdate(Saturday),1,7)  SatMonth
+
+from
+(select 
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) Sunday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1))+ 1 Monday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) + 2 Tuesday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) + 3 Wednesday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) + 4 Thursday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) + 5 Friday,
+(( convert(datetime, #prompt('SEL_START')# , 120) - datepart( dw,convert(datetime, #prompt('SEL_START')# , 120) )      )+ 1) + (7 *(wk -1)) + 6 Saturday 
+from dual, 
+(select 1 wk from dual union select 2  from dual union select 3  from dual union 
+select 4  from dual union select 5  from dual union select 6  from dual union
+select 7  from dual union select 8  from dual union select 9  from dual union
+select 10  from dual union select 11  from dual union select 12  from dual union
+select 13  from dual union select 14  from dual union select 15  from dual union
+select 16  from dual union select 17  from dual union select 18  from dual union
+select 19  from dual union select 20  from dual union select 21  from dual union 
+select 22  from dual union select 23  from dual union select 24  from dual union
+select 25  from dual union select 26  from dual union select 27  from dual union
+select 28  from dual union select 29  from dual union select 30  from dual union
+select 31  from dual union select 32  from dual union select 33  from dual union 
+select 34  from dual union select 35  from dual union select 36  from dual union 
+select 37  from dual union select 38  from dual union select 39  from dual union 
+select 40  from dual union select 41  from dual union select 42  from dual union 
+select 43  from dual union select 44  from dual union select 45  from dual union 
+select 46  from dual union select 47  from dual union select 48  from dual union 
+select 49  from dual union select 50  from dual union select 51  from dual union 
+select 52  from dual union select 53  from dual  ) a
+)b
+ ) WOY
+
+WHERE MNTH = SunMonth OR MNTH = SatMonth</sqlText>
+		<mdProjectedItems><mdProjectedItem name="mnth"/><mdProjectedItem name="DMNTH"/><mdProjectedItem name="Sunday"/><mdProjectedItem name="Monday"/><mdProjectedItem name="Tuesday"/><mdProjectedItem name="Wednesday"/><mdProjectedItem name="Thursday"/><mdProjectedItem name="Friday"/><mdProjectedItem name="Saturday"/></mdProjectedItems></sqlQuery></source>
+						<selection><dataItem name="sunmon"><expression>substring ( REPGETCOMPDATE ( [Sunday] ), 1, 7)</expression></dataItem><dataItem name="monmon"><expression>substring ( REPGETCOMPDATE ([Monday] ), 1, 7)</expression></dataItem><dataItem name="tuemon"><expression>substring ( REPGETCOMPDATE ([Tuesday] ), 1, 7)</expression></dataItem><dataItem name="wedmon"><expression>substring ( REPGETCOMPDATE ( [Wednesday] ), 1, 7)</expression></dataItem><dataItem name="thrmon"><expression>substring ( REPGETCOMPDATE ( [Thursday] ), 1, 7)</expression></dataItem><dataItem name="frimon"><expression>substring ( REPGETCOMPDATE ( [Friday] ), 1, 7)</expression></dataItem><dataItem name="satmon"><expression>substring ( REPGETCOMPDATE ( [Saturday] ), 1, 7)</expression></dataItem><dataItem name="mnth"><expression>[SQL1].[mnth]</expression></dataItem><dataItem name="DMNTH"><expression>[SQL1].[DMNTH]</expression></dataItem><dataItem name="Sunday"><expression>[SQL1].[Sunday]</expression></dataItem><dataItem name="Monday"><expression>[SQL1].[Monday]</expression></dataItem><dataItem name="Tuesday"><expression>[SQL1].[Tuesday]</expression></dataItem><dataItem name="Wednesday"><expression>[SQL1].[Wednesday]</expression></dataItem><dataItem name="Thursday"><expression>[SQL1].[Thursday]</expression></dataItem><dataItem name="Friday"><expression>[SQL1].[Friday]</expression></dataItem><dataItem name="Saturday"><expression>[SQL1].[Saturday]</expression></dataItem></selection>
+					</query><query name="SUN">
+			<source>
+				
+			<sqlQuery name="SQL4" dataSource="AdvRepData">
+			<sqlText>select ppo_ppm, PDATE,  isnull(est,0) est
+from 
+  ( select ppo_ppm,
+case ppo_perioduom 
+when 'W' then dateadd(wk,  tp * ppo_freq, ppo_due)
+when  'M' then dateadd(mm, tp * ppo_freq, ppo_due)
+when  'Q' then dateadd(qq, tp * ppo_freq, ppo_due)
+when  'Y' then dateadd(yy, tp * ppo_freq, ppo_due)
+else null end PDATE, ppo_mrc, ppo_org, est
+from 
+(select ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org, sum(ppa_est) est
+from r5ppmobjects left outer join r5ppmacts on ppa_ppm = ppo_ppm and ppo_revision = ppa_revision
+group by ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org) a,
+(select 0 tp from dual union select 1 from dual union select 2  from dual union select 3  from dual union 
+select 4  from dual union select 5  from dual union select 6  from dual union
+select 7  from dual union select 8  from dual union select 9  from dual union
+select 10  from dual union select 11  from dual union select 12  from dual union
+select 13  from dual union select 14  from dual union select 15  from dual union
+select 16  from dual union select 17  from dual union select 18  from dual union
+select 19  from dual union select 20  from dual union select 21  from dual union 
+select 22  from dual union select 23  from dual union select 24  from dual union
+select 25  from dual union select 26  from dual union select 27  from dual union
+select 28  from dual union select 29  from dual union select 30  from dual union
+select 31  from dual union select 32  from dual union select 33  from dual union 
+select 34  from dual union select 35  from dual union select 36  from dual union 
+select 37  from dual union select 38  from dual union select 39  from dual union 
+select 40  from dual union select 41  from dual union select 42  from dual union 
+select 43  from dual union select 44  from dual union select 45  from dual union 
+select 46  from dual union select 47  from dual union select 48  from dual union 
+select 49  from dual union select 50  from dual union select 51  from dual union 
+select 52  from dual ) b   )  c   
+
+where PDATE between  convert(datetime, #prompt('SEL_START')# , 120) 
+and  dateadd(mm,   #prompt('NO_MONTHS')#  + 1, convert(datetime, #prompt('SEL_START')# , 120)  )
+and ppo_org = #prompt('SEL_ORG')#
+and (ppo_mrc = #prompt('SEL_MRC')# OR #prompt('SEL_MRC')# ='%' )
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="ppo_ppm"/><mdProjectedItem name="PDATE"/><mdProjectedItem name="est"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="ppo_ppm"><expression>[SQL4].[ppo_ppm]</expression></dataItem><dataItem name="PDATE"><expression>[SQL4].[PDATE]</expression></dataItem><dataItem name="est"><expression>[SQL4].[est]</expression></dataItem><dataItemListSummary refDataItem="est" aggregateMethod="total" name="Total(est)"/><dataItemListSummary refDataItem="est" aggregateMethod="count" name="Count(est)"/></selection>
+		</query><query name="MON">
+			<source>
+				
+			<sqlQuery name="SQL4" dataSource="AdvRepData">
+			<sqlText>select ppo_ppm, PDATE,  isnull(est,0) est
+from 
+  ( select ppo_ppm,
+case ppo_perioduom 
+when 'W' then dateadd(wk,  tp * ppo_freq, ppo_due)
+when  'M' then dateadd(mm, tp * ppo_freq, ppo_due)
+when  'Q' then dateadd(qq, tp * ppo_freq, ppo_due)
+when  'Y' then dateadd(yy, tp * ppo_freq, ppo_due)
+else null end PDATE, ppo_mrc, ppo_org, est
+from 
+(select ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org, sum(ppa_est) est
+from r5ppmobjects left outer join r5ppmacts on ppa_ppm = ppo_ppm and ppo_revision = ppa_revision
+group by ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org) a,
+(select 0 tp from dual union select 1 from dual union select 2  from dual union select 3  from dual union 
+select 4  from dual union select 5  from dual union select 6  from dual union
+select 7  from dual union select 8  from dual union select 9  from dual union
+select 10  from dual union select 11  from dual union select 12  from dual union
+select 13  from dual union select 14  from dual union select 15  from dual union
+select 16  from dual union select 17  from dual union select 18  from dual union
+select 19  from dual union select 20  from dual union select 21  from dual union 
+select 22  from dual union select 23  from dual union select 24  from dual union
+select 25  from dual union select 26  from dual union select 27  from dual union
+select 28  from dual union select 29  from dual union select 30  from dual union
+select 31  from dual union select 32  from dual union select 33  from dual union 
+select 34  from dual union select 35  from dual union select 36  from dual union 
+select 37  from dual union select 38  from dual union select 39  from dual union 
+select 40  from dual union select 41  from dual union select 42  from dual union 
+select 43  from dual union select 44  from dual union select 45  from dual union 
+select 46  from dual union select 47  from dual union select 48  from dual union 
+select 49  from dual union select 50  from dual union select 51  from dual union 
+select 52  from dual ) b   )  c   
+
+where PDATE between  convert(datetime, #prompt('SEL_START')# , 120) 
+and  dateadd(mm,   #prompt('NO_MONTHS')#  + 1, convert(datetime, #prompt('SEL_START')# , 120)  )
+and ppo_org = #prompt('SEL_ORG')#
+and (ppo_mrc = #prompt('SEL_MRC')# OR #prompt('SEL_MRC')# ='%' )
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="ppo_ppm"/><mdProjectedItem name="PDATE"/><mdProjectedItem name="est"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="ppo_ppm"><expression>[SQL4].[ppo_ppm]</expression></dataItem><dataItem name="PDATE"><expression>[SQL4].[PDATE]</expression></dataItem><dataItem name="est"><expression>[SQL4].[est]</expression></dataItem><dataItemListSummary refDataItem="est" aggregateMethod="total" name="Total(est)"/><dataItemListSummary refDataItem="est" aggregateMethod="count" name="Count(est)"/></selection>
+		</query><query name="TUE">
+			<source>
+				
+			<sqlQuery name="SQL4" dataSource="AdvRepData">
+			<sqlText>select ppo_ppm, PDATE,  isnull(est,0) est
+from 
+  ( select ppo_ppm,
+case ppo_perioduom 
+when 'W' then dateadd(wk,  tp * ppo_freq, ppo_due)
+when  'M' then dateadd(mm, tp * ppo_freq, ppo_due)
+when  'Q' then dateadd(qq, tp * ppo_freq, ppo_due)
+when  'Y' then dateadd(yy, tp * ppo_freq, ppo_due)
+else null end PDATE, ppo_mrc, ppo_org, est
+from 
+(select ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org, sum(ppa_est) est
+from r5ppmobjects left outer join r5ppmacts on ppa_ppm = ppo_ppm and ppo_revision = ppa_revision
+group by ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org) a,
+(select 0 tp from dual union select 1 from dual union select 2  from dual union select 3  from dual union 
+select 4  from dual union select 5  from dual union select 6  from dual union
+select 7  from dual union select 8  from dual union select 9  from dual union
+select 10  from dual union select 11  from dual union select 12  from dual union
+select 13  from dual union select 14  from dual union select 15  from dual union
+select 16  from dual union select 17  from dual union select 18  from dual union
+select 19  from dual union select 20  from dual union select 21  from dual union 
+select 22  from dual union select 23  from dual union select 24  from dual union
+select 25  from dual union select 26  from dual union select 27  from dual union
+select 28  from dual union select 29  from dual union select 30  from dual union
+select 31  from dual union select 32  from dual union select 33  from dual union 
+select 34  from dual union select 35  from dual union select 36  from dual union 
+select 37  from dual union select 38  from dual union select 39  from dual union 
+select 40  from dual union select 41  from dual union select 42  from dual union 
+select 43  from dual union select 44  from dual union select 45  from dual union 
+select 46  from dual union select 47  from dual union select 48  from dual union 
+select 49  from dual union select 50  from dual union select 51  from dual union 
+select 52  from dual ) b   )  c   
+
+where PDATE between  convert(datetime, #prompt('SEL_START')# , 120) 
+and  dateadd(mm,   #prompt('NO_MONTHS')#  + 1, convert(datetime, #prompt('SEL_START')# , 120)  )
+and ppo_org = #prompt('SEL_ORG')#
+and (ppo_mrc = #prompt('SEL_MRC')# OR #prompt('SEL_MRC')# ='%' )
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="ppo_ppm"/><mdProjectedItem name="PDATE"/><mdProjectedItem name="est"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="ppo_ppm"><expression>[SQL4].[ppo_ppm]</expression></dataItem><dataItem name="PDATE"><expression>[SQL4].[PDATE]</expression></dataItem><dataItem name="est"><expression>[SQL4].[est]</expression></dataItem><dataItemListSummary refDataItem="est" aggregateMethod="total" name="Total(est)"/><dataItemListSummary refDataItem="est" aggregateMethod="count" name="Count(est)"/></selection>
+		</query><query name="WED">
+			<source>
+				
+			<sqlQuery name="SQL4" dataSource="AdvRepData">
+			<sqlText>select ppo_ppm, PDATE,  isnull(est,0) est
+from 
+  ( select ppo_ppm,
+case ppo_perioduom 
+when 'W' then dateadd(wk,  tp * ppo_freq, ppo_due)
+when  'M' then dateadd(mm, tp * ppo_freq, ppo_due)
+when  'Q' then dateadd(qq, tp * ppo_freq, ppo_due)
+when  'Y' then dateadd(yy, tp * ppo_freq, ppo_due)
+else null end PDATE, ppo_mrc, ppo_org, est
+from 
+(select ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org, sum(ppa_est) est
+from r5ppmobjects left outer join r5ppmacts on ppa_ppm = ppo_ppm and ppo_revision = ppa_revision
+group by ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org) a,
+(select 0 tp from dual union select 1 from dual union select 2  from dual union select 3  from dual union 
+select 4  from dual union select 5  from dual union select 6  from dual union
+select 7  from dual union select 8  from dual union select 9  from dual union
+select 10  from dual union select 11  from dual union select 12  from dual union
+select 13  from dual union select 14  from dual union select 15  from dual union
+select 16  from dual union select 17  from dual union select 18  from dual union
+select 19  from dual union select 20  from dual union select 21  from dual union 
+select 22  from dual union select 23  from dual union select 24  from dual union
+select 25  from dual union select 26  from dual union select 27  from dual union
+select 28  from dual union select 29  from dual union select 30  from dual union
+select 31  from dual union select 32  from dual union select 33  from dual union 
+select 34  from dual union select 35  from dual union select 36  from dual union 
+select 37  from dual union select 38  from dual union select 39  from dual union 
+select 40  from dual union select 41  from dual union select 42  from dual union 
+select 43  from dual union select 44  from dual union select 45  from dual union 
+select 46  from dual union select 47  from dual union select 48  from dual union 
+select 49  from dual union select 50  from dual union select 51  from dual union 
+select 52  from dual ) b   )  c   
+
+where PDATE between  convert(datetime, #prompt('SEL_START')# , 120) 
+and  dateadd(mm,   #prompt('NO_MONTHS')#  + 1, convert(datetime, #prompt('SEL_START')# , 120)  )
+and ppo_org = #prompt('SEL_ORG')#
+and (ppo_mrc = #prompt('SEL_MRC')# OR #prompt('SEL_MRC')# ='%' )
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="ppo_ppm"/><mdProjectedItem name="PDATE"/><mdProjectedItem name="est"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="ppo_ppm"><expression>[SQL4].[ppo_ppm]</expression></dataItem><dataItem name="PDATE"><expression>[SQL4].[PDATE]</expression></dataItem><dataItem name="est"><expression>[SQL4].[est]</expression></dataItem><dataItemListSummary refDataItem="est" aggregateMethod="total" name="Total(est)"/><dataItemListSummary refDataItem="est" aggregateMethod="count" name="Count(est)"/></selection>
+		</query><query name="THUR">
+			<source>
+				
+			<sqlQuery name="SQL4" dataSource="AdvRepData">
+			<sqlText>select ppo_ppm, PDATE,  isnull(est,0) est
+from 
+  ( select ppo_ppm,
+case ppo_perioduom 
+when 'W' then dateadd(wk,  tp * ppo_freq, ppo_due)
+when  'M' then dateadd(mm, tp * ppo_freq, ppo_due)
+when  'Q' then dateadd(qq, tp * ppo_freq, ppo_due)
+when  'Y' then dateadd(yy, tp * ppo_freq, ppo_due)
+else null end PDATE, ppo_mrc, ppo_org, est
+from 
+(select ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org, sum(ppa_est) est
+from r5ppmobjects left outer join r5ppmacts on ppa_ppm = ppo_ppm and ppo_revision = ppa_revision
+group by ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org) a,
+(select 0 tp from dual union select 1 from dual union select 2  from dual union select 3  from dual union 
+select 4  from dual union select 5  from dual union select 6  from dual union
+select 7  from dual union select 8  from dual union select 9  from dual union
+select 10  from dual union select 11  from dual union select 12  from dual union
+select 13  from dual union select 14  from dual union select 15  from dual union
+select 16  from dual union select 17  from dual union select 18  from dual union
+select 19  from dual union select 20  from dual union select 21  from dual union 
+select 22  from dual union select 23  from dual union select 24  from dual union
+select 25  from dual union select 26  from dual union select 27  from dual union
+select 28  from dual union select 29  from dual union select 30  from dual union
+select 31  from dual union select 32  from dual union select 33  from dual union 
+select 34  from dual union select 35  from dual union select 36  from dual union 
+select 37  from dual union select 38  from dual union select 39  from dual union 
+select 40  from dual union select 41  from dual union select 42  from dual union 
+select 43  from dual union select 44  from dual union select 45  from dual union 
+select 46  from dual union select 47  from dual union select 48  from dual union 
+select 49  from dual union select 50  from dual union select 51  from dual union 
+select 52  from dual ) b   )  c   
+
+where PDATE between  convert(datetime, #prompt('SEL_START')# , 120) 
+and  dateadd(mm,   #prompt('NO_MONTHS')#  + 1, convert(datetime, #prompt('SEL_START')# , 120)  )
+and ppo_org = #prompt('SEL_ORG')#
+and (ppo_mrc = #prompt('SEL_MRC')# OR #prompt('SEL_MRC')# ='%' )
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="ppo_ppm"/><mdProjectedItem name="PDATE"/><mdProjectedItem name="est"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="ppo_ppm"><expression>[SQL4].[ppo_ppm]</expression></dataItem><dataItem name="PDATE"><expression>[SQL4].[PDATE]</expression></dataItem><dataItem name="est"><expression>[SQL4].[est]</expression></dataItem><dataItemListSummary refDataItem="est" aggregateMethod="total" name="Total(est)"/><dataItemListSummary refDataItem="est" aggregateMethod="count" name="Count(est)"/></selection>
+		</query><query name="FRI">
+			<source>
+				
+			<sqlQuery name="SQL4" dataSource="AdvRepData">
+			<sqlText>select ppo_ppm, PDATE,  isnull(est,0) est
+from 
+  ( select ppo_ppm,
+case ppo_perioduom 
+when 'W' then dateadd(wk,  tp * ppo_freq, ppo_due)
+when  'M' then dateadd(mm, tp * ppo_freq, ppo_due)
+when  'Q' then dateadd(qq, tp * ppo_freq, ppo_due)
+when  'Y' then dateadd(yy, tp * ppo_freq, ppo_due)
+else null end PDATE, ppo_mrc, ppo_org, est
+from 
+(select ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org, sum(ppa_est) est
+from r5ppmobjects left outer join r5ppmacts on ppa_ppm = ppo_ppm and ppo_revision = ppa_revision
+group by ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org) a,
+(select 0 tp from dual union select 1 from dual union select 2  from dual union select 3  from dual union 
+select 4  from dual union select 5  from dual union select 6  from dual union
+select 7  from dual union select 8  from dual union select 9  from dual union
+select 10  from dual union select 11  from dual union select 12  from dual union
+select 13  from dual union select 14  from dual union select 15  from dual union
+select 16  from dual union select 17  from dual union select 18  from dual union
+select 19  from dual union select 20  from dual union select 21  from dual union 
+select 22  from dual union select 23  from dual union select 24  from dual union
+select 25  from dual union select 26  from dual union select 27  from dual union
+select 28  from dual union select 29  from dual union select 30  from dual union
+select 31  from dual union select 32  from dual union select 33  from dual union 
+select 34  from dual union select 35  from dual union select 36  from dual union 
+select 37  from dual union select 38  from dual union select 39  from dual union 
+select 40  from dual union select 41  from dual union select 42  from dual union 
+select 43  from dual union select 44  from dual union select 45  from dual union 
+select 46  from dual union select 47  from dual union select 48  from dual union 
+select 49  from dual union select 50  from dual union select 51  from dual union 
+select 52  from dual ) b   )  c   
+
+where PDATE between  convert(datetime, #prompt('SEL_START')# , 120) 
+and  dateadd(mm,   #prompt('NO_MONTHS')#  + 1, convert(datetime, #prompt('SEL_START')# , 120)  )
+and ppo_org = #prompt('SEL_ORG')#
+and (ppo_mrc = #prompt('SEL_MRC')# OR #prompt('SEL_MRC')# ='%' )
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="ppo_ppm"/><mdProjectedItem name="PDATE"/><mdProjectedItem name="est"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="ppo_ppm"><expression>[SQL4].[ppo_ppm]</expression></dataItem><dataItem name="PDATE"><expression>[SQL4].[PDATE]</expression></dataItem><dataItem name="est"><expression>[SQL4].[est]</expression></dataItem><dataItemListSummary refDataItem="est" aggregateMethod="total" name="Total(est)"/><dataItemListSummary refDataItem="est" aggregateMethod="count" name="Count(est)"/></selection>
+		</query><query name="SAT">
+			<source>
+				
+			<sqlQuery name="SQL4" dataSource="AdvRepData">
+			<sqlText>select ppo_ppm, PDATE,  isnull(est,0) est
+from 
+  ( select ppo_ppm,
+case ppo_perioduom 
+when 'W' then dateadd(wk,  tp * ppo_freq, ppo_due)
+when  'M' then dateadd(mm, tp * ppo_freq, ppo_due)
+when  'Q' then dateadd(qq, tp * ppo_freq, ppo_due)
+when  'Y' then dateadd(yy, tp * ppo_freq, ppo_due)
+else null end PDATE, ppo_mrc, ppo_org, est
+from 
+(select ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org, sum(ppa_est) est
+from r5ppmobjects left outer join r5ppmacts on ppa_ppm = ppo_ppm and ppo_revision = ppa_revision
+group by ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org) a,
+(select 0 tp from dual union select 1 from dual union select 2  from dual union select 3  from dual union 
+select 4  from dual union select 5  from dual union select 6  from dual union
+select 7  from dual union select 8  from dual union select 9  from dual union
+select 10  from dual union select 11  from dual union select 12  from dual union
+select 13  from dual union select 14  from dual union select 15  from dual union
+select 16  from dual union select 17  from dual union select 18  from dual union
+select 19  from dual union select 20  from dual union select 21  from dual union 
+select 22  from dual union select 23  from dual union select 24  from dual union
+select 25  from dual union select 26  from dual union select 27  from dual union
+select 28  from dual union select 29  from dual union select 30  from dual union
+select 31  from dual union select 32  from dual union select 33  from dual union 
+select 34  from dual union select 35  from dual union select 36  from dual union 
+select 37  from dual union select 38  from dual union select 39  from dual union 
+select 40  from dual union select 41  from dual union select 42  from dual union 
+select 43  from dual union select 44  from dual union select 45  from dual union 
+select 46  from dual union select 47  from dual union select 48  from dual union 
+select 49  from dual union select 50  from dual union select 51  from dual union 
+select 52  from dual ) b   )  c   
+
+where PDATE between  convert(datetime, #prompt('SEL_START')# , 120) 
+and  dateadd(mm,   #prompt('NO_MONTHS')#  + 1, convert(datetime, #prompt('SEL_START')# , 120)  )
+and ppo_org = #prompt('SEL_ORG')#
+and (ppo_mrc = #prompt('SEL_MRC')# OR #prompt('SEL_MRC')# ='%' )
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="ppo_ppm"/><mdProjectedItem name="PDATE"/><mdProjectedItem name="est"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="ppo_ppm"><expression>[SQL4].[ppo_ppm]</expression></dataItem><dataItem name="PDATE"><expression>[SQL4].[PDATE]</expression></dataItem><dataItem name="est"><expression>[SQL4].[est]</expression></dataItem><dataItemListSummary refDataItem="est" aggregateMethod="total" name="Total(est)"/><dataItemListSummary refDataItem="est" aggregateMethod="count" name="Count(est)"/></selection>
+		</query><query name="Query1"><source><model/></source><selection><dataItem name="ORG_CODE" aggregate="none"><expression>[Base].[R5ORGANIZATION].[ORG_CODE]</expression></dataItem></selection></query><query name="Query2"><source><model/></source><selection><dataItem name="MRC_CODE" aggregate="none"><expression>[Base].[R5MRCS].[MRC_CODE]</expression></dataItem></selection></query><query name="with hist">
+			<source>
+				
+			<sqlQuery name="SQL4" dataSource="AdvRepData">
+			<sqlText>select WO, ppo_ppm, PDATE
+from 
+  ( select null "WO",ppo_ppm,
+case ppo_perioduom 
+when 'W' then dateadd(wk,  tp * ppo_freq, ppo_due)
+when  'M' then dateadd(mm, tp * ppo_freq, ppo_due)
+when  'Q' then dateadd(qq, tp * ppo_freq, ppo_due)
+when  'Y' then dateadd(yy, tp * ppo_freq, ppo_due)
+else null end PDATE, ppo_mrc, ppo_org
+from 
+(select ppo_ppm, ppo_due, ppo_freq, ppo_perioduom, ppo_mrc, ppo_org
+from r5ppmobjects) a,
+(select 0 tp from dual union select 1 from dual union select 2  from dual union select 3  from dual union 
+select 4  from dual union select 5  from dual union select 6  from dual union
+select 7  from dual union select 8  from dual union select 9  from dual union
+select 10  from dual union select 11  from dual union select 12  from dual union
+select 13  from dual union select 14  from dual union select 15  from dual union
+select 16  from dual union select 17  from dual union select 18  from dual union
+select 19  from dual union select 20  from dual union select 21  from dual union 
+select 22  from dual union select 23  from dual union select 24  from dual union
+select 25  from dual union select 26  from dual union select 27  from dual union
+select 28  from dual union select 29  from dual union select 30  from dual union
+select 31  from dual union select 32  from dual union select 33  from dual union 
+select 34  from dual union select 35  from dual union select 36  from dual union 
+select 37  from dual union select 38  from dual union select 39  from dual union 
+select 40  from dual union select 41  from dual union select 42  from dual union 
+select 43  from dual union select 44  from dual union select 45  from dual union 
+select 46  from dual union select 47  from dual union select 48  from dual union 
+select 49  from dual union select 50  from dual union select 51  from dual union 
+select 52  from dual ) b    
+union
+select evt_code, evt_ppm, evt_due, evt_mrc, evt_org
+from r5events
+)  c  
+
+where PDATE between  convert(datetime, #prompt('SEL_START')# , 120) 
+and  dateadd(mm,   #prompt('NO_MONTHS')#  + 1, convert(datetime, #prompt('SEL_START')# , 120)  )
+and ppo_org = #prompt('SEL_ORG')#
+and (ppo_mrc = #prompt('SEL_MRC')# OR #prompt('SEL_MRC')# ='%' )
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="WO"/><mdProjectedItem name="ppo_ppm"/><mdProjectedItem name="PDATE"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="ppo_ppm"><expression>[SQL4].[ppo_ppm]</expression></dataItem><dataItem name="PDATE"><expression>[SQL4].[PDATE]</expression></dataItem></selection>
+		</query></queries>
+				<layouts>
+					<layout>
+						<reportPages>
+							
+						<pageSet name="Page Set1" refQuery="page set">
+			<detailPages><page name="Month" refQuery="calendar"><style><defaultStyles><defaultStyle refStyle="pg"/></defaultStyles></style>
+								<pageBody><style><defaultStyles><defaultStyle refStyle="pb"/></defaultStyles></style>
+									<contents>
+										
+									<table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><dataItemValue refDataItem="DMNTH"/></dataSource><style><CSS value="font-style:italic;font-weight:bold;font-size:12pt;padding-top:2mm;padding-bottom:2mm"/></style></textItem></contents><style><CSS value="text-align:center;height:0.5in"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><list horizontalPagination="true" name="List1" refQuery="calendar">
+											
+											
+											
+											<style>
+												<defaultStyles>
+													<defaultStyle refStyle="ls"/>
+												</defaultStyles>
+												<CSS value="border-collapse:collapse;width:90%"/>
+											</style>
+										<propertyList><propertyItem refDataItem="sunmon"/><propertyItem refDataItem="monmon"/><propertyItem refDataItem="tuemon"/><propertyItem refDataItem="wedmon"/><propertyItem refDataItem="thrmon"/><propertyItem refDataItem="frimon"/><propertyItem refDataItem="satmon"/><propertyItem refDataItem="mnth"/><propertyItem refDataItem="DMNTH"/></propertyList><listColumns><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Sunday"/></dataSource><style><CSS value="font-weight:bold"/></style></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="height:1.1in;text-align:center;border-top-width:1pt;border-top-style:solid;border-right-width:1pt;border-right-style:solid;border-bottom-width:1pt;border-bottom-style:solid;border-left-width:1pt;border-left-style:solid"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Sunday"/></dataSource><style><dataFormat><dateFormat dateStyle="short" showMonths="false" showYears="false"/></dataFormat><CSS value="margin-bottom:2mm;height:0.15in"/></style><conditionalRender refVariable="sunok"><renderFor refVariableValue="1"/></conditionalRender></textItem><list horizontalPagination="true" name="List2" refQuery="SUN" showColumnTitles="hide">
+			
+			
+			
+			
+			<style>
+				<CSS value="border-collapse:collapse"/>
+				<defaultStyles>
+					<defaultStyle refStyle="ls"/>
+				</defaultStyles>
+			</style>
+		<listColumns><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:left"/></style><contents><textItem><dataSource><dataItemValue refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="est"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="est"/></dataSource></textItem></contents></listColumnBody></listColumn></listColumns><conditionalRender refVariable="sunok"><renderFor refVariableValue="1"/></conditionalRender><masterDetailLinks><masterDetailLink><masterContext><dataItemContext refDataItem="Sunday"/></masterContext><detailContext><dataItemContext refDataItem="PDATE"/></detailContext></masterDetailLink></masterDetailLinks><listColumnBodyStyle><style><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></listColumnBodyStyle><listOverallGroup><listFooter><listRows><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>Total Hours</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Total(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>WO Count</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Count(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow></listRows></listFooter></listOverallGroup></list></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Monday"/></dataSource><style><CSS value="font-weight:bold"/></style></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center;width:1in"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Monday"/></dataSource><style><dataFormat><dateFormat dateStyle="short" showMonths="false" showYears="false"/></dataFormat><CSS value="margin-bottom:2mm;height:0.15in"/></style><conditionalRender refVariable="monok"><renderFor refVariableValue="1"/></conditionalRender></textItem><list horizontalPagination="true" name="List3" refQuery="MON" showColumnTitles="hide">
+			
+			
+			
+			
+			<style>
+				<CSS value="border-collapse:collapse"/>
+				<defaultStyles>
+					<defaultStyle refStyle="ls"/>
+				</defaultStyles>
+			</style>
+		<listColumns><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:left"/></style><contents><textItem><dataSource><dataItemValue refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="est"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="est"/></dataSource></textItem></contents></listColumnBody></listColumn></listColumns><listColumnBodyStyle><style><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></listColumnBodyStyle><listOverallGroup><listFooter><listRows><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>Total Hours</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Total(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>WO Count</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Count(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow></listRows></listFooter></listOverallGroup><masterDetailLinks><masterDetailLink><masterContext><dataItemContext refDataItem="Monday"/></masterContext><detailContext><dataItemContext refDataItem="PDATE"/></detailContext></masterDetailLink></masterDetailLinks><conditionalRender refVariable="monok"><renderFor refVariableValue="1"/></conditionalRender></list></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Tuesday"/></dataSource><style><CSS value="font-weight:bold"/></style></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Tuesday"/></dataSource><style><dataFormat><dateFormat dateStyle="short" showMonths="false" showYears="false"/></dataFormat><CSS value="margin-bottom:2mm;height:0.15in"/></style><conditionalRender refVariable="tueok"><renderFor refVariableValue="1"/></conditionalRender></textItem><list horizontalPagination="true" name="List4" refQuery="TUE" showColumnTitles="hide">
+			
+			
+			
+			
+			<style>
+				<CSS value="border-collapse:collapse"/>
+				<defaultStyles>
+					<defaultStyle refStyle="ls"/>
+				</defaultStyles>
+			</style>
+		<listColumns><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:left"/></style><contents><textItem><dataSource><dataItemValue refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="est"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="est"/></dataSource></textItem></contents></listColumnBody></listColumn></listColumns><listColumnBodyStyle><style><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></listColumnBodyStyle><listOverallGroup><listFooter><listRows><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>Total Hours</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Total(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>WO Count</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Count(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow></listRows></listFooter></listOverallGroup><masterDetailLinks><masterDetailLink><masterContext><dataItemContext refDataItem="Tuesday"/></masterContext><detailContext><dataItemContext refDataItem="PDATE"/></detailContext></masterDetailLink></masterDetailLinks><conditionalRender refVariable="tueok"><renderFor refVariableValue="1"/></conditionalRender></list></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles><CSS value="font-weight:bold"/></style><contents><textItem><dataSource><dataItemLabel refDataItem="Wednesday"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Wednesday"/></dataSource><style><dataFormat><dateFormat dateStyle="short" showMonths="false" showYears="false"/></dataFormat><CSS value="margin-bottom:2mm;height:0.15in"/></style><conditionalRender refVariable="wedok"><renderFor refVariableValue="1"/></conditionalRender></textItem><list horizontalPagination="true" name="List5" refQuery="WED" showColumnTitles="hide">
+			
+			
+			
+			
+			<style>
+				<CSS value="border-collapse:collapse"/>
+				<defaultStyles>
+					<defaultStyle refStyle="ls"/>
+				</defaultStyles>
+			</style>
+		<listColumns><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:left"/></style><contents><textItem><dataSource><dataItemValue refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="est"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="est"/></dataSource></textItem></contents></listColumnBody></listColumn></listColumns><listColumnBodyStyle><style><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></listColumnBodyStyle><listOverallGroup><listFooter><listRows><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>Total Hours</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Total(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>WO Count</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Count(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow></listRows></listFooter></listOverallGroup><masterDetailLinks><masterDetailLink><masterContext><dataItemContext refDataItem="Wednesday"/></masterContext><detailContext><dataItemContext refDataItem="PDATE"/></detailContext></masterDetailLink></masterDetailLinks><conditionalRender refVariable="wedok"><renderFor refVariableValue="1"/></conditionalRender></list></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Thursday"/></dataSource><style><CSS value="font-weight:bold"/></style></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Thursday"/></dataSource><style><dataFormat><dateFormat dateStyle="short" showMonths="false" showYears="false"/></dataFormat><CSS value="margin-bottom:2mm;height:0.15in"/></style><conditionalRender refVariable="throk"><renderFor refVariableValue="1"/></conditionalRender></textItem><list horizontalPagination="true" name="List6" refQuery="THUR" showColumnTitles="hide">
+			
+			
+			
+			
+			<style>
+				<CSS value="border-collapse:collapse"/>
+				<defaultStyles>
+					<defaultStyle refStyle="ls"/>
+				</defaultStyles>
+			</style>
+		<listColumns><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:left"/></style><contents><textItem><dataSource><dataItemValue refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="est"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="est"/></dataSource></textItem></contents></listColumnBody></listColumn></listColumns><listColumnBodyStyle><style><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></listColumnBodyStyle><listOverallGroup><listFooter><listRows><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>Total Hours</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Total(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>WO Count</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Count(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow></listRows></listFooter></listOverallGroup><masterDetailLinks><masterDetailLink><masterContext><dataItemContext refDataItem="Thursday"/></masterContext><detailContext><dataItemContext refDataItem="PDATE"/></detailContext></masterDetailLink></masterDetailLinks><conditionalRender refVariable="throk"><renderFor refVariableValue="1"/></conditionalRender></list></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Friday"/></dataSource><style><CSS value="font-weight:bold"/></style></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Friday"/></dataSource><style><dataFormat><dateFormat dateStyle="short" showMonths="false" showYears="false"/></dataFormat><CSS value="margin-bottom:2mm;height:0.15in"/></style><conditionalRender refVariable="friok"><renderFor refVariableValue="1"/></conditionalRender></textItem><list horizontalPagination="true" name="List7" refQuery="FRI" showColumnTitles="hide">
+			
+			
+			
+			
+			<style>
+				<CSS value="border-collapse:collapse"/>
+				<defaultStyles>
+					<defaultStyle refStyle="ls"/>
+				</defaultStyles>
+			</style>
+		<listColumns><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:left"/></style><contents><textItem><dataSource><dataItemValue refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="est"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="est"/></dataSource></textItem></contents></listColumnBody></listColumn></listColumns><listColumnBodyStyle><style><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></listColumnBodyStyle><listOverallGroup><listFooter><listRows><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>Total Hours</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Total(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>WO Count</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Count(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow></listRows></listFooter></listOverallGroup><masterDetailLinks><masterDetailLink><masterContext><dataItemContext refDataItem="Friday"/></masterContext><detailContext><dataItemContext refDataItem="PDATE"/></detailContext></masterDetailLink></masterDetailLinks><conditionalRender refVariable="friok"><renderFor refVariableValue="1"/></conditionalRender></list></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="Saturday"/></dataSource><style><CSS value="font-weight:bold"/></style></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="Saturday"/></dataSource><style><dataFormat><dateFormat dateStyle="short" showMonths="false" showYears="false"/></dataFormat><CSS value="margin-bottom:2mm;height:0.15in"/></style><conditionalRender refVariable="satok"><renderFor refVariableValue="1"/></conditionalRender></textItem><list horizontalPagination="true" name="List8" refQuery="SAT" showColumnTitles="hide">
+			
+			
+			
+			
+			<style>
+				<CSS value="border-collapse:collapse"/>
+				<defaultStyles>
+					<defaultStyle refStyle="ls"/>
+				</defaultStyles>
+			</style>
+		<listColumns><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:left"/></style><contents><textItem><dataSource><dataItemValue refDataItem="ppo_ppm"/></dataSource></textItem></contents></listColumnBody></listColumn><listColumn><listColumnTitle><style><defaultStyles><defaultStyle refStyle="lt"/></defaultStyles></style><contents><textItem><dataSource><dataItemLabel refDataItem="est"/></dataSource></textItem></contents></listColumnTitle><listColumnBody><style><defaultStyles><defaultStyle refStyle="lm"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><dataItemValue refDataItem="est"/></dataSource></textItem></contents></listColumnBody></listColumn></listColumns><listColumnBodyStyle><style><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></listColumnBodyStyle><listOverallGroup><listFooter><listRows><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>Total Hours</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Total(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow><listRow><rowCells><rowCell><contents><textItem><dataSource><staticValue>WO Count</staticValue></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="if"/></defaultStyles><CSS value="border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell><rowCell><contents><textItem><dataSource><dataItemValue refDataItem="Count(est)"/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="is"/></defaultStyles><CSS value="text-align:center;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none"/></style></rowCell></rowCells></listRow></listRows></listFooter></listOverallGroup><masterDetailLinks><masterDetailLink><masterContext><dataItemContext refDataItem="Saturday"/></masterContext><detailContext><dataItemContext refDataItem="PDATE"/></detailContext></masterDetailLink></masterDetailLinks><conditionalRender refVariable="satok"><renderFor refVariableValue="1"/></conditionalRender></list></contents></listColumnBody></listColumn></listColumns><sortList><sortItem refDataItem="Sunday" sortOrder="ascending"/></sortList><listColumnBodyStyle><style><CSS value="border-top-style:solid;border-right-style:solid;border-bottom-style:solid;border-left-style:solid"/></style></listColumnBodyStyle><listColumnTitleStyle><style><CSS value="border-top-width:1pt;border-top-style:solid;border-right-width:1pt;border-right-style:solid;border-bottom-width:1pt;border-bottom-style:solid;border-left-width:1pt;border-left-style:solid"/></style></listColumnTitleStyle><masterDetailLinks><masterDetailLink><masterContext><dataItemContext refDataItem="mnth"/></masterContext><detailContext><dataItemContext refDataItem="mnth"/></detailContext></masterDetailLink></masterDetailLinks></list></contents><style><CSS value="text-align:center"/></style></tableCell></tableCells></tableRow></tableRows></table></contents>
+								</pageBody>
+								<pageHeader>
+									<contents>
+										
+									<block>
+			<contents><textItem><dataSource><staticValue>PM Schedule Calendar Starting: </staticValue></dataSource><style><CSS value="font-weight:bold;font-size:11pt"/></style></textItem><textItem><dataSource><reportExpression>ParamDisplayValue('SEL_START')</reportExpression></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><staticValue>          Department:  </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><reportExpression>ParamDisplayValue('SEL_MRC')</reportExpression></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><staticValue>          Organization:  </staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem><textItem><dataSource><reportExpression>ParamDisplayValue('SEL_ORG')</reportExpression></dataSource><style><CSS value="font-weight:bold"/></style></textItem></contents>
+		<style><CSS value="text-align:left"/></style></block></contents>
+									<style>
+										<defaultStyles>
+											<defaultStyle refStyle="ph"/>
+										</defaultStyles>
+										<CSS value="padding-bottom:10px"/>
+									</style>
+								</pageHeader>
+								<pageFooter>
+									<contents>
+										<table>
+											<tableRows>
+												<tableRow>
+													<tableCells>
+														<tableCell>
+															<contents>
+																<date>
+																	<style>
+																		<dataFormat>
+																			<dateFormat/>
+																		</dataFormat>
+																	</style>
+																</date>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:left;width:25%"/>
+															</style>
+														</tableCell>
+														<tableCell>
+															<contents>
+																<pageNumber/>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:center;width:50%"/>
+															</style>
+														</tableCell>
+														<tableCell>
+															<contents>
+																<time>
+																	<style>
+																		<dataFormat>
+																			<timeFormat/>
+																		</dataFormat>
+																	</style>
+																</time>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:right;width:25%"/>
+															</style>
+														</tableCell>
+													</tableCells>
+												</tableRow>
+											</tableRows>
+											<style>
+												<defaultStyles>
+													<defaultStyle refStyle="tb"/>
+												</defaultStyles>
+												<CSS value="border-collapse:collapse;width:100%"/>
+											</style>
+										</table>
+									</contents>
+									<style>
+										<defaultStyles>
+											<defaultStyle refStyle="pf"/>
+										</defaultStyles>
+										<CSS value="padding-top:10px"/>
+									</style>
+								</pageFooter>
+							<masterDetailLinks><masterDetailLink><masterContext><dataItemContext refDataItem="mnth"/></masterContext><detailContext><dataItemContext refDataItem="mnth"/></detailContext></masterDetailLink></masterDetailLinks></page></detailPages>
+		<pageGroups><pageGroup refDataItem="mnth"/></pageGroups></pageSet></reportPages>
+					<pageSetup orientation="landscape"/><promptPages><page name="Prompt Page1">
+			<pageHeader>
+				<contents>
+					
+				<textItem><dataSource><staticValue>PM Schedule Calendar Parameters</staticValue></dataSource><style><CSS value="font-weight:bold"/></style></textItem></contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="hp"/>
+					</defaultStyles>
+				</style>
+			</pageHeader>
+			<pageBody>
+				<contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Organization: </staticValue></dataSource></textItem></contents><style><CSS value="font-size:10pt"/></style></tableCell><tableCell><contents><selectValue parameter="SEL_ORG" refQuery="Query1" multiSelect="false" range="false" required="true"><useItem refDataItem="ORG_CODE"/></selectValue></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Department: </staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectValue parameter="SEL_MRC" refQuery="Query2" multiSelect="false" range="false" required="true"><useItem refDataItem="MRC_CODE"/><selectOptions><selectOption useValue="%"><displayValue>All</displayValue></selectOption></selectOptions></selectValue></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Start Date: </staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectDate multiSelect="false" parameter="SEL_START" range="false" required="true" selectDateUI="editBox"/></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Months (1-12)</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textBox multiSelect="false" numbersOnly="false" parameter="NO_MONTHS" range="false" required="true"><defaultSelections><defaultSimpleSelection>1</defaultSimpleSelection></defaultSelections></textBox></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow></tableRows></table></contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="py"/>
+					</defaultStyles>
+				</style>
+			</pageBody>
+			<pageFooter>
+				<contents>
+					<promptButton type="cancel">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="back">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="next">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="finish">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+				</contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="fp"/>
+					</defaultStyles>
+				</style>
+			</pageFooter>
+			<style>
+				<defaultStyles>
+					<defaultStyle refStyle="pp"/>
+				</defaultStyles>
+			</style>
+		</page></promptPages></layout>
+				</layouts>
+			<XMLAttributes><XMLAttribute name="RS_CreateExtendedDataItems" output="no" value="true"/><XMLAttribute name="listSeparator" output="no" value=","/><XMLAttribute name="RS_modelModificationTime" value="2013-10-01T08:51:57.387Z" output="no"/></XMLAttributes><reportVariables><reportVariable name="sunok" type="boolean">
+			<reportExpression>[calendar].[sunmon] = [page set].[mnth] </reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="monok" type="boolean">
+			<reportExpression>[calendar].[monmon] =  [page set].[mnth]</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="tueok" type="boolean">
+			<reportExpression>[calendar].[tuemon] =  [page set].[mnth]</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="wedok" type="boolean">
+			<reportExpression>[calendar].[wedmon] =  [page set].[mnth]</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="throk" type="boolean">
+			<reportExpression>[calendar].[thrmon] = [page set].[mnth]</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="friok" type="boolean">
+			<reportExpression>[calendar].[frimon] =  [page set].[mnth]</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable name="satok" type="boolean">
+			<reportExpression>[calendar].[satmon] = [page set].[mnth]</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable></reportVariables><reportName>pm_cal_rm1.3.xml</reportName></report>

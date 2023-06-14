@@ -1,0 +1,18 @@
+curl --location --request POST 'https://iostps01.water.local:7443/infor/CustomerApi/a/ews/EWSConnector' \
+--header 'Authorization: Bearer 035a6e74b696b8965e952cec72a1227b' \
+--header 'Content-Type: text/plain' \
+--data-raw '<?xml version="1.0" encoding="utf-8"?>
+<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Header>
+    <Tenant>infor</Tenant>
+    <SessionScenario xmlns="http://schemas.datastream.net/headers">terminate</SessionScenario>
+    <Organization xmlns="http://schemas.datastream.net/headers">VDP</Organization>
+  </Header>
+  <Body>
+    <MP0601_GetUserSetup_001 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" verb="Get" noun="UserSetup" version="001" xmlns="http://schemas.datastream.net/MP_functions/MP0601_001">
+      <USERID xmlns="http://schemas.datastream.net/MP_fields">
+        <USERCODE>ALEACH</USERCODE>
+      </USERID>
+    </MP0601_GetUserSetup_001>
+  </Body>
+</Envelope>'

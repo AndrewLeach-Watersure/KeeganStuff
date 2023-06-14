@@ -1,0 +1,128 @@
+Ext.define('EAM.custom.external_UUCHV2', {
+    extend: 'EAM.custom.AbstractExtensibleFramework',
+    getSelectors: function () {
+        return {
+            '[extensibleFramework] [tabName=HDR][isTabView=true] [name=wspf_10_cha_need]': {
+                focus: function (field, lastValues) {
+                    EAM.Utils.debugMessage('Focus');
+                    var  vFormPanel = EAM.Utils.getCurrentTab().getFormPanel(),
+                    vFieldValue = vFormPanel.getFldValue('wspf_10_cha_need');
+                    console.log('after Form Panel');
+                    vFormPanel.setFldValue('wspf_10_description', 'Who is your god now?', true);
+}},
+ '[extensibleFramework] [tabName=HDR][isTabView=true] [name=wspf_10_cha_event]': {
+blur: function (field, lastValues) {
+var vFormPanel = EAM.Utils.getCurrentTab().getFormPanel(),
+wspf_10_cha_need = vFormPanel.getFldValue('wspf_10_cha_need');
+
+Ext.create('Ext.window.Window', {
+                title: 'Change Management Form',
+                layout: 'fit',
+                width: 900,
+                minWidth: 250,
+                height: 800,
+                closable: true,
+		animCollapse:false,
+                border: true,
+                modal: true,
+            scrollable: true,
+                
+                layout: {
+                    type: 'border',
+                    scrollable: true,
+                    padding: 5
+                },
+    items: [
+        {
+            xtype: 'fieldset',
+            title: 'My Fields',
+            scrollable: true,
+            items: [
+                {
+                    xtype: 'container',
+                    layout: {
+                        type: 'vbox',
+            scrollable: true,
+                        align: 'stretch'
+                    },
+                    items: [
+                        {
+                            xtype: 'container',
+            scrollable: true,
+                            flex: 1,
+
+                            layout: {
+                                type: 'hbox',
+            scrollable: true,
+                                align: 'stretch'
+                            },
+                            items: [
+                                {
+                                    xtype: 'textfield',
+                                    fieldLabel: 'Label'
+                                },
+                                {
+                                    xtype: 'checkboxfield',
+                                    fieldLabel: 'Label',
+                                    boxLabel: 'Box Label'
+                                },
+                                {
+                                    xtype: 'checkboxfield',
+                                    flex: 1,
+                                    fieldLabel: 'Label',
+                                    boxLabel: 'Box Label'
+                                },
+                                {
+                                    xtype: 'checkboxfield',
+                                    flex: 1,
+                                    fieldLabel: 'Label',
+                                    boxLabel: 'Box Label'
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'textareafield',
+                            flex: 1,
+                            height: 250,
+                            fieldLabel: 'Statement of Need/Benefit/ Reasons/Risks in this Project',
+                            value: wspf_10_cha_need
+                        },
+                        {
+                            xtype: 'textareafield',
+                            flex: 1,
+                            fieldLabel: 'Aims/Objectives'
+                        },
+                        {
+                            xtype: 'textareafield',
+                            flex: 1,
+                            fieldLabel: 'Return on Investment /Payback Period / Justification'
+                        },
+                        {
+                            xtype: 'textareafield',
+                            flex: 1,
+                            height: 172,
+                            fieldLabel: 'Indicative Schedule & Resources to be used'
+                        },
+                        {
+                            xtype: 'textareafield',
+                            flex: 1,
+                            fieldLabel: 'Interface/Relevant Stakeholders'
+                        },
+                        {
+                            xtype: 'textareafield',
+                            flex: 1,
+                            fieldLabel: 'Analysis of Options/Engineering Investigation/ Suggested Option'
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+            }).show();
+
+}
+                
+            }
+        }
+    }
+});

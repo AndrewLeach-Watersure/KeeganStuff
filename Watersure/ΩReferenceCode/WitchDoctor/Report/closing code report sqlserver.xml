@@ -1,0 +1,885 @@
+<report xmlns="http://developer.cognos.com/schemas/report/8.0/" useStyleVersion="10" expressionLocale="en">
+				<modelPath>/content/package[@name='Infor10EAMPackage_1012']/model[@name='model']</modelPath>
+				<drillBehavior modelBasedDrillThru="true"/>
+				
+				<layouts>
+					<layout>
+						<reportPages>
+							<page name="Page1"><style><defaultStyles><defaultStyle refStyle="pg"/></defaultStyles></style>
+								<pageBody><style><defaultStyles><defaultStyle refStyle="pb"/></defaultStyles></style>
+									<contents>
+										
+									<table allowPageBreaksWithinRow="false" repeatOnPageBreak="false"><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents/><style><CSS value="height:20px"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="font-family:Georgia;text-align:center;font-size:11pt;font-weight:bold"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Monthly CrossTab</staticValue></dataSource><style><CSS value="height:20px;margin-top:10px;margin-bottom:10px"/></style></textItem></contents><style><CSS value="text-align:center;font-family:Georgia;font-size:11pt;font-weight:bold"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><crosstab horizontalPagination="true" name="Crosstab1" refQuery="monthly xtab">
+			<crosstabCorner>
+				<contents><textItem><dataSource><dataItemLabel refDataItem="WO Cnt"/></dataSource></textItem></contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="xm"/>
+					</defaultStyles>
+				</style>
+			</crosstabCorner>
+			
+			
+			<noDataHandler>
+				<contents>
+					<block>
+						<contents>
+							<textItem>
+								<dataSource>
+									<staticValue>No Data Available</staticValue>
+								</dataSource>
+								<style>
+									<CSS value="padding:10px 18px;"/>
+								</style>
+							</textItem>
+						</contents>
+					</block>
+				</contents>
+			</noDataHandler>
+			<style>
+				<CSS value="border-collapse:collapse;width:9in"/>
+				<defaultStyles>
+					<defaultStyle refStyle="xt"/>
+				</defaultStyles>
+			</style>
+		<crosstabFactCell><contents><textItem><dataSource><cellValue/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="mv"/></defaultStyles></style></crosstabFactCell><crosstabColumns><crosstabNode><crosstabNodeMembers><crosstabNodeMember refDataItem="Month" edgeLocation="e1"><style><defaultStyles><defaultStyle refStyle="ml"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><memberCaption/></dataSource></textItem></contents><sortList><sortItem refDataItem="smonth"/></sortList></crosstabNodeMember></crosstabNodeMembers></crosstabNode></crosstabColumns><crosstabRows><crosstabNode><crosstabNodeMembers><crosstabNodeMember refDataItem="Code" edgeLocation="e2"><style><defaultStyles><defaultStyle refStyle="ml"/></defaultStyles><CSS value="white-space:nowrap"/></style><contents><combinationChart showTooltips="true" maxHotspots="10000" refQuery="monthly xtab" name="Combination Chart1">
+																				<ordinalAxis showAxisLabels="false">
+																					<style>
+																						<defaultStyles>
+																							<defaultStyle refStyle="al"/>
+																						</defaultStyles>
+																					</style>
+																				</ordinalAxis>
+																				<numericalAxisY1 showAxisLabels="false">
+																					<style>
+																						<defaultStyles>
+																							<defaultStyle refStyle="al"/>
+																						</defaultStyles>
+																					</style>
+																				</numericalAxisY1>
+																				<combinationChartTypes>
+																					<bar><chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Code"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes></bar>
+																				</combinationChartTypes>
+																				<style>
+																					<defaultStyles>
+																						<defaultStyle refStyle="ch"/>
+																					</defaultStyles>
+																					<CSS value="padding:0px;width:80px;height:35px;vertical-align:middle"/>
+																				</style>
+																				<XMLAttributes>
+																					<XMLAttribute name="beganAsMicroChart" value="true" output="no"/>
+																				</XMLAttributes>
+																				<commonClusters><chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Month"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="smonth"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></commonClusters><defaultChartMeasure refDataItem="WO Cnt"/><masterDetailLinks><masterDetailLink><masterContext><dataItemContext refDataItem="Code"/></masterContext><detailContext><dataItemContext refDataItem="Code"/></detailContext></masterDetailLink></masterDetailLinks><chartPalette>
+																					<chartGradient direction="left" fromColor="#8599D3" toColor="#5876AE"/>
+																				</chartPalette>
+																			</combinationChart>
+																			<textItem><dataSource><memberCaption/></dataSource></textItem></contents><sortList><sortItem refDataItem="Code"/></sortList></crosstabNodeMember></crosstabNodeMembers></crosstabNode></crosstabRows><defaultMeasure refDataItem="WO Cnt"/></crosstab></contents><style><CSS value="text-align:center"/></style></tableCell></tableCells></tableRow></tableRows><conditionalRender refVariable="MONTHLY CROSSTAB"><renderFor refVariableValue="1"/></conditionalRender></table></contents><style><CSS value="text-align:center"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="font-family:Georgia;text-align:center;font-size:11pt;font-weight:bold"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Monthly Chart</staticValue></dataSource><style><CSS value="height:20px;margin-top:10px;margin-bottom:10px;font-weight:bold"/></style></textItem></contents><style><CSS value="font-family:Georgia;font-size:11pt;text-align:center"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><combinationChart showTooltips="true" maxHotspots="10000" refQuery="monthly chart" name="Combination Chart2">
+														<legend>
+															<legendPosition>
+																<relativePosition/>
+															</legendPosition>
+															<legendTitle refQuery="monthly chart">
+																<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style>
+															</legendTitle>
+															<style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style>
+														</legend>
+														<ordinalAxis>
+															<axisTitle refQuery="monthly chart">
+																<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style>
+															</axisTitle>
+															<axisLine color="black"/>
+															<style>
+																<defaultStyles>
+																	<defaultStyle refStyle="al"/>
+																</defaultStyles>
+															</style>
+															<labelControl><autoLabelControl allowRotate90DegreesForCategoryLabels="false" allowStaggerForCategoryLabels="false" allowSkipForCategoryLabels="false"/></labelControl></ordinalAxis>
+														<numericalAxisY1 scaleInterval="1">
+															<axisTitle refQuery="monthly chart">
+																<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style>
+															</axisTitle>
+															<gridlines color="#cccccc"/>
+															<axisLine color="black"/>
+															<style>
+																<defaultStyles>
+																	<defaultStyle refStyle="al"/>
+																</defaultStyles>
+															</style>
+														</numericalAxisY1>
+														<combinationChartTypes>
+															<bar><chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Code"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes></bar>
+														</combinationChartTypes>
+														<style>
+															<CSS value="width:9in"/><defaultStyles><defaultStyle refStyle="ch"/></defaultStyles></style>
+														<defaultChartMeasure refDataItem="WO Cnt"/><commonClusters><chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Month"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="smonth"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></commonClusters><XMLAttributes><XMLAttribute name="titlesExpanded" value="true" output="no"/></XMLAttributes><chartPalette><chartColor value="#000066"/><chartColor value="#99CCFF"/><chartColor value="#336699"/><chartColor value="#F3F3F3"/><chartColor value="#999999"/><chartColor value="#E3E9F3"/><chartColor value="#0084e3"/><chartColor value="#E7E7E7"/><chartColor value="#99AACC"/><chartColor value="#CCCCCC"/></chartPalette></combinationChart></contents><style><CSS value="text-align:center"/></style></tableCell></tableCells></tableRow></tableRows><conditionalRender refVariable="MONTHLY CHART"><renderFor refVariableValue="1"/></conditionalRender></table>
+												</contents><style><CSS value="text-align:center"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="font-family:Georgia;text-align:center;font-size:11pt;font-weight:bold"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Yearly CrossTab</staticValue></dataSource><style><CSS value="height:20px;margin-top:10px;margin-bottom:10px;font-weight:bold"/></style></textItem></contents><style><CSS value="font-family:Georgia;font-size:11pt;text-align:center"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><crosstab horizontalPagination="true" name="Crosstab2" refQuery="annual xtab">
+			<crosstabCorner>
+				<contents><textItem><dataSource><dataItemLabel refDataItem="WO Cnt"/></dataSource></textItem></contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="xm"/>
+					</defaultStyles>
+				</style>
+			</crosstabCorner>
+			
+			
+			<noDataHandler>
+				<contents>
+					<block>
+						<contents>
+							<textItem>
+								<dataSource>
+									<staticValue>No Data Available</staticValue>
+								</dataSource>
+								<style>
+									<CSS value="padding:10px 18px;"/>
+								</style>
+							</textItem>
+						</contents>
+					</block>
+				</contents>
+			</noDataHandler>
+			<style>
+				<CSS value="border-collapse:collapse;width:9in"/>
+				<defaultStyles>
+					<defaultStyle refStyle="xt"/>
+				</defaultStyles>
+			</style>
+		<crosstabFactCell><contents><textItem><dataSource><cellValue/></dataSource></textItem></contents><style><defaultStyles><defaultStyle refStyle="mv"/></defaultStyles></style></crosstabFactCell><crosstabRows><crosstabNode><crosstabNodeMembers><crosstabNodeMember refDataItem="Code" edgeLocation="e1"><style><defaultStyles><defaultStyle refStyle="ml"/></defaultStyles><CSS value="white-space:nowrap"/></style><contents><combinationChart showTooltips="true" maxHotspots="10000" refQuery="annual xtab" name="Combination Chart3">
+																				<ordinalAxis showAxisLabels="false">
+																					<style>
+																						<defaultStyles>
+																							<defaultStyle refStyle="al"/>
+																						</defaultStyles>
+																					</style>
+																				</ordinalAxis>
+																				<numericalAxisY1 showAxisLabels="false">
+																					<style>
+																						<defaultStyles>
+																							<defaultStyle refStyle="al"/>
+																						</defaultStyles>
+																					</style>
+																				</numericalAxisY1>
+																				<combinationChartTypes>
+																					<bar><chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Code"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes></bar>
+																				</combinationChartTypes>
+																				<style>
+																					<defaultStyles>
+																						<defaultStyle refStyle="ch"/>
+																					</defaultStyles>
+																					<CSS value="padding:0px;width:80px;height:35px;vertical-align:middle"/>
+																				</style>
+																				<XMLAttributes>
+																					<XMLAttribute name="beganAsMicroChart" value="true" output="no"/>
+																				</XMLAttributes>
+																				<commonClusters><chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Year"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents><sortList><sortItem refDataItem="Year"/></sortList></chartNodeMember></chartNodeMembers></chartNode></chartNodes></commonClusters><defaultChartMeasure refDataItem="WO Cnt"/><masterDetailLinks><masterDetailLink><masterContext><dataItemContext refDataItem="Code"/></masterContext><detailContext><dataItemContext refDataItem="Code"/></detailContext></masterDetailLink></masterDetailLinks><chartPalette>
+																					<chartGradient direction="left" fromColor="#8599D3" toColor="#5876AE"/>
+																				</chartPalette>
+																			</combinationChart>
+																			<textItem><dataSource><memberCaption/></dataSource></textItem></contents><sortList><sortItem refDataItem="Code"/></sortList></crosstabNodeMember></crosstabNodeMembers></crosstabNode></crosstabRows><crosstabColumns><crosstabNode><crosstabNodeMembers><crosstabNodeMember refDataItem="Year" edgeLocation="e2"><style><defaultStyles><defaultStyle refStyle="ml"/></defaultStyles><CSS value="text-align:center"/></style><contents><textItem><dataSource><memberCaption/></dataSource></textItem></contents><sortList><sortItem refDataItem="Year"/></sortList></crosstabNodeMember></crosstabNodeMembers></crosstabNode></crosstabColumns><defaultMeasure refDataItem="WO Cnt"/></crosstab></contents><style><CSS value="text-align:center"/></style></tableCell></tableCells></tableRow></tableRows><conditionalRender refVariable="YEARLY CROSSTAB"><renderFor refVariableValue="1"/></conditionalRender></table></contents><style><CSS value="text-align:center"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="font-family:Georgia;text-align:center;font-size:11pt;font-weight:bold"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents>
+												<table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Yearly Chart</staticValue></dataSource><style><CSS value="height:20px;margin-top:10px;margin-bottom:10px;font-weight:bold"/></style></textItem></contents><style><CSS value="font-family:Georgia;font-size:11pt;text-align:center"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><combinationChart showTooltips="true" maxHotspots="10000" refQuery="annual chart" name="Combination Chart4">
+														<legend>
+															<legendPosition>
+																<relativePosition/>
+															</legendPosition>
+															<legendTitle refQuery="annual chart">
+																<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="lx"/>
+																	</defaultStyles>
+																</style>
+															</legendTitle>
+															<style>
+																<defaultStyles>
+																	<defaultStyle refStyle="lg"/>
+																</defaultStyles>
+															</style>
+														</legend>
+														<ordinalAxis>
+															<axisTitle refQuery="annual chart">
+																<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style>
+															</axisTitle>
+															<axisLine color="black"/>
+															<style>
+																<defaultStyles>
+																	<defaultStyle refStyle="al"/>
+																</defaultStyles>
+															</style>
+														</ordinalAxis>
+														<numericalAxisY1 scaleInterval="1">
+															<axisTitle refQuery="annual chart">
+																<style>
+																	<defaultStyles>
+																		<defaultStyle refStyle="at"/>
+																	</defaultStyles>
+																</style>
+															</axisTitle>
+															<gridlines color="#cccccc"/>
+															<axisLine color="black"/>
+															<style>
+																<defaultStyles>
+																	<defaultStyle refStyle="al"/>
+																</defaultStyles>
+															</style>
+														</numericalAxisY1>
+														<combinationChartTypes>
+															<bar><chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Code"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes></bar>
+														</combinationChartTypes>
+														<style>
+															<defaultStyles>
+																<defaultStyle refStyle="ch"/>
+															</defaultStyles>
+															<CSS value="width:9in"/></style>
+														<commonClusters><chartNodes><chartNode><chartNodeMembers><chartNodeMember refDataItem="Year"><chartContents><chartTextItem><dataSource><memberCaption/></dataSource></chartTextItem></chartContents></chartNodeMember></chartNodeMembers></chartNode></chartNodes></commonClusters><defaultChartMeasure refDataItem="WO Cnt"/><chartPalette><chartColor value="#336666"/><chartColor value="#FFCC00"/><chartColor value="#D6E0CD"/><chartColor value="#FFFFCC"/><chartColor value="#669966"/><chartColor value="#FFEA96"/><chartColor value="#B3E283"/><chartColor value="#9CBC6B"/><chartColor value="#FFE16A"/><chartColor value="#CC9900"/></chartPalette></combinationChart></contents><style><CSS value="text-align:center"/></style></tableCell></tableCells></tableRow></tableRows><conditionalRender refVariable="YEARLY CHART"><renderFor refVariableValue="1"/></conditionalRender></table></contents><style><CSS value="text-align:center"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell></tableCells></tableRow></tableRows></table></contents>
+								</pageBody>
+								<pageHeader>
+									<contents>
+										
+									<table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%;font-family:Georgia"/></style><tableRows><tableRow><tableCells><tableCell colSpan="6"><contents><textItem><dataSource><staticValue>Closing Code Analysis Report</staticValue></dataSource><style><CSS value="font-size:12pt;font-weight:bold;padding-top:5px;padding-bottom:5px;height:15px"/></style></textItem></contents><style><CSS value="text-align:center"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Organization(s)</staticValue></dataSource></textItem></contents><style><CSS value="width:12%"/></style></tableCell><tableCell><contents><textItem><dataSource><reportExpression>ParamDisplayValue('SEL_ORG')</reportExpression></dataSource></textItem></contents><style><CSS value="width:21.33%"/></style></tableCell><tableCell><contents><textItem><dataSource><staticValue>Department(s)</staticValue></dataSource></textItem></contents><style><CSS value="width:12%"/></style></tableCell><tableCell><contents><textItem><dataSource><reportExpression>ParamDisplayValue('SEL_MRC')</reportExpression></dataSource></textItem></contents><style><CSS value="width:21.33%"/></style></tableCell><tableCell><contents><textItem><dataSource><staticValue>Work Order Type(s)</staticValue></dataSource></textItem></contents><style><CSS value="width:12%"/></style></tableCell><tableCell><contents><textItem><dataSource><reportExpression>ParamDisplayValue('SEL_JBTP')</reportExpression></dataSource></textItem></contents><style><CSS value="width:21.33%"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Equipment Class(es)</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textItem><dataSource><reportExpression>ParamDisplayValue('SEL_CLASS')</reportExpression></dataSource></textItem></contents></tableCell><tableCell><contents><textItem><dataSource><staticValue>Start Date</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><singleton refQuery="display dates" name="Singleton1">
+			<contents><textItem><dataSource><dataItemValue refDataItem="startdate"/></dataSource><style><dataFormat><dateFormat dateStyle="medium"/></dataFormat></style></textItem></contents>
+		</singleton></contents></tableCell><tableCell><contents><textItem><dataSource><staticValue>End Date</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><singleton refQuery="display dates" name="Singleton2">
+			<contents><textItem><dataSource><dataItemValue refDataItem="enddate"/></dataSource><style><dataFormat><dateFormat dateStyle="medium"/></dataFormat></style></textItem></contents>
+		</singleton></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="height:7px"/></style></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell colSpan="6"><contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Problem(s)</staticValue></dataSource></textItem></contents><style><CSS value="width:10%"/></style></tableCell><tableCell><contents><textItem><dataSource><reportExpression>ParamDisplayValue('SEL_PROBLEM')</reportExpression></dataSource></textItem></contents><style><CSS value="width:38%"/></style></tableCell><tableCell><contents/><style><CSS value="width:4%"/></style></tableCell><tableCell><contents><textItem><dataSource><staticValue>Cause(s)</staticValue></dataSource></textItem></contents><style><CSS value="width:10%"/></style></tableCell><tableCell><contents><textItem><dataSource><reportExpression>ParamDisplayValue('SEL_CAUSE')</reportExpression></dataSource></textItem></contents><style><CSS value="width:38%"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Failure(s)</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textItem><dataSource><reportExpression>ParamDisplayValue('SEL_FAILURE')</reportExpression></dataSource></textItem></contents></tableCell><tableCell><contents/></tableCell><tableCell><contents><textItem><dataSource><staticValue>Action(s)</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><textItem><dataSource><reportExpression>ParamDisplayValue('SEL_ACTION')</reportExpression></dataSource></textItem></contents></tableCell></tableCells></tableRow></tableRows></table></contents></tableCell></tableCells></tableRow></tableRows></table></contents>
+									<style>
+										<defaultStyles>
+											<defaultStyle refStyle="ph"/>
+										</defaultStyles>
+										<CSS value="padding-bottom:10px"/>
+									</style>
+								</pageHeader>
+								<pageFooter>
+									<contents>
+										<table>
+											<tableRows>
+												<tableRow>
+													<tableCells>
+														<tableCell>
+															<contents>
+																<date>
+																	<style>
+																		<dataFormat>
+																			<dateFormat/>
+																		</dataFormat>
+																	</style>
+																</date>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:left;width:25%"/>
+															</style>
+														</tableCell>
+														<tableCell>
+															<contents>
+																<pageNumber/>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:center;width:50%"/>
+															</style>
+														</tableCell>
+														<tableCell>
+															<contents>
+																<time>
+																	<style>
+																		<dataFormat>
+																			<timeFormat/>
+																		</dataFormat>
+																	</style>
+																</time>
+															</contents>
+															<style>
+																<CSS value="vertical-align:top;text-align:right;width:25%"/>
+															</style>
+														</tableCell>
+													</tableCells>
+												</tableRow>
+											</tableRows>
+											<style>
+												<defaultStyles>
+													<defaultStyle refStyle="tb"/>
+												</defaultStyles>
+												<CSS value="border-collapse:collapse;width:100%"/>
+											</style>
+										</table>
+									</contents>
+									<style>
+										<defaultStyles>
+											<defaultStyle refStyle="pf"/>
+										</defaultStyles>
+										<CSS value="padding-top:10px"/>
+									</style>
+								</pageFooter>
+							</page>
+						</reportPages>
+					<promptPages><page name="Prompt Page1">
+			
+			<pageBody>
+				<contents><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%;font-family:Georgia"/></style><tableRows><tableRow><tableCells><tableCell colSpan="6"><contents><textItem><dataSource><staticValue>Closing Code Analysis Report</staticValue></dataSource><style><CSS value="font-size:12pt;font-weight:bold;padding-top:5px;padding-bottom:5px;height:15px"/></style></textItem></contents><style><CSS value="text-align:center"/></style></tableCell></tableCells></tableRow></tableRows></table><table><style><defaultStyles><defaultStyle refStyle="tb"/></defaultStyles><CSS value="border-collapse:collapse;width:100%;font-family:Georgia"/></style><tableRows><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Organization(s)</staticValue></dataSource></textItem></contents><style><CSS value="width:12%"/></style></tableCell><tableCell><contents><selectValue parameter="SEL_ORG" multiSelect="true" range="false" required="true" refQuery="org lov" selectValueUI="checkboxGroup"><useItem refDataItem="ORG_CODE"/><selectOptions><selectOption useValue="All"/></selectOptions></selectValue></contents><style><CSS value="width:35.5%"/></style></tableCell><tableCell><contents/><style><CSS value="width:5%"/></style></tableCell><tableCell><contents/><style><CSS value="width:12%"/></style></tableCell><tableCell><contents/><style><CSS value="width:35.5%"/></style></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="height:10px"/></style></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Apply Organization</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><promptButton type="reprompt">
+			<contents/>
+			<style>
+				<defaultStyles>
+					<defaultStyle refStyle="bp"/>
+				</defaultStyles>
+			</style>
+		</promptButton></contents></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="height:10px"/></style></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Department(s)</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectValue multiSelect="true" range="false" required="true" refQuery="mrc lov" selectValueUI="checkboxGroup" parameter="SEL_MRC" cascadeOn="SEL_ORG"><selectOptions><selectOption useValue="All"/></selectOptions><useItem refDataItem="MRC_DESC"><displayItem refDataItem="MRC_CODE"/></useItem></selectValue></contents></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Work Order Type(s)</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectValue multiSelect="true" range="false" required="true" refQuery="jbtp lov" selectValueUI="checkboxGroup" parameter="SEL_JBTP"><selectOptions><selectOption useValue="All"/></selectOptions><useItem refDataItem="UCO_CODE"><displayItem refDataItem="UCO_DESC"/></useItem></selectValue></contents></tableCell><tableCell><contents/></tableCell><tableCell><contents><textItem><dataSource><staticValue>Equipment Class(es)</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectValue multiSelect="true" range="false" required="true" refQuery="class lov" selectValueUI="checkboxGroup" parameter="SEL_CLASS"><selectOptions><selectOption useValue="All"/></selectOptions><useItem refDataItem="CLS_CODE"><displayItem refDataItem="CLS_DESC"/></useItem></selectValue></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Start Date</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectDate parameter="SEL_START" multiSelect="false" range="false" required="true" selectDateUI="editBox"/></contents></tableCell><tableCell><contents/></tableCell><tableCell><contents><textItem><dataSource><staticValue>End Date</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectDate multiSelect="false" range="false" required="true" selectDateUI="editBox" parameter="SEL_END"/></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="height:10px"/></style></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Fetch Closing Codes</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><promptButton type="reprompt">
+			<contents/>
+			<style>
+				<defaultStyles>
+					<defaultStyle refStyle="bp"/>
+				</defaultStyles>
+			</style>
+		</promptButton></contents></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/><style><CSS value="height:10px"/></style></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Problem(s)</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectValue multiSelect="true" range="false" required="true" refQuery="problem lov" selectValueUI="checkboxGroup" parameter="SEL_PROBLEM" cascadeOn="SEL_END"><selectOptions><selectOption useValue="none"/></selectOptions><useItem refDataItem="rqm_code"><displayItem refDataItem="rqm_desc"/></useItem></selectValue></contents></tableCell><tableCell><contents/></tableCell><tableCell><contents><textItem><dataSource><staticValue>Cause(s)</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectValue multiSelect="true" range="false" required="true" refQuery="cause lov" selectValueUI="checkboxGroup" parameter="SEL_CAUSE" cascadeOn="SEL_END"><selectOptions><selectOption useValue="none"/></selectOptions><useItem refDataItem="cau_code"><displayItem refDataItem="cau_desc"/></useItem></selectValue></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Action(s)</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectValue multiSelect="true" range="false" required="true" refQuery="action lov" selectValueUI="checkboxGroup" parameter="SEL_ACTION" cascadeOn="SEL_END"><selectOptions><selectOption useValue="none"/></selectOptions><useItem refDataItem="acc_code"><displayItem refDataItem="acc_desc"/></useItem></selectValue></contents></tableCell><tableCell><contents/></tableCell><tableCell><contents><textItem><dataSource><staticValue>Failure(s)</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectValue multiSelect="true" range="false" required="true" refQuery="fail lov" selectValueUI="checkboxGroup" parameter="SEL_FAILURE" cascadeOn="SEL_END"><selectOptions><selectOption useValue="none"/></selectOptions><useItem refDataItem="fal_code"><displayItem refDataItem="fal_desc"/></useItem></selectValue></contents></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents><textItem><dataSource><staticValue>Show</staticValue></dataSource></textItem></contents></tableCell><tableCell><contents><selectValue parameter="SHOW" multiSelect="true" selectValueUI="checkboxGroup"><selectOptions><selectOption useValue="MONTHLY CROSSTAB"/><selectOption useValue="MONTHLY CHART"/><selectOption useValue="YEARLY CROSSTAB"/><selectOption useValue="YEARLY CHART"/></selectOptions></selectValue></contents></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow><tableRow><tableCells><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell><tableCell><contents/></tableCell></tableCells></tableRow></tableRows></table></contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="py"/>
+					</defaultStyles>
+				</style>
+			</pageBody>
+			<pageFooter>
+				<contents>
+					<promptButton type="cancel">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="back">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="next">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+					<promptButton type="finish">
+						<contents/>
+						<style>
+							<defaultStyles>
+								<defaultStyle refStyle="bp"/>
+							</defaultStyles>
+						</style>
+					</promptButton>
+				</contents>
+				<style>
+					<defaultStyles>
+						<defaultStyle refStyle="fp"/>
+					</defaultStyles>
+				</style>
+			</pageFooter>
+			<style>
+				<defaultStyles>
+					<defaultStyle refStyle="pp"/>
+				</defaultStyles>
+			</style>
+		</page></promptPages><pageSetup orientation="landscape"/></layout>
+				</layouts>
+			<XMLAttributes><XMLAttribute name="RS_CreateExtendedDataItems" value="true" output="no"/><XMLAttribute name="listSeparator" value="," output="no"/><XMLAttribute name="RS_modelModificationTime" value="2013-05-01T16:19:15.830Z" output="no"/></XMLAttributes><queries><query name="monthly xtab"><source><sqlQuery name="SQL1" dataSource="AdvRepData">
+			<sqlText>select acc_desc "Code",
+substring(datename(month, ma),1,3) + ' '+ datename(year, ma) "Month", 
+ma "smonth",
+wcnt "WO Cnt"
+
+from 
+
+(select convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)  ma from dual
+union select dateadd(month, 1,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 2,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 3,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 4,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 5,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 6,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 7,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 8,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 9,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 10,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 11,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual) a
+
+left outer join
+
+(select acc_desc, 
+cast((evt_completed - day(evt_completed) )+ 1 as date) mth, 
+count(*) wcnt
+from r5actioncodes inner join r5events on acc_code = evt_action
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where  acc_code in (#promptmany('SEL_ACTION')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by acc_desc, cast((evt_completed - day(evt_completed) )+ 1 as date) 
+
+union
+select cau_desc , 
+cast((evt_completed - day(evt_completed) )+ 1 as date), 
+count(*)
+from r5causes inner join r5events on cau_code = evt_cause
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where cau_code in (#promptmany('SEL_CAUSE')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by cau_desc, cast((evt_completed - day(evt_completed) )+ 1 as date)
+
+union
+select fal_desc, 
+cast((evt_completed - day(evt_completed) )+ 1 as date),
+count(*) 
+from r5failures inner join r5events on fal_code = evt_failure
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where  fal_code in (#promptmany('SEL_FAILURE')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by fal_desc, cast((evt_completed - day(evt_completed) )+ 1 as date)
+
+union
+select rqm_desc ,
+cast((evt_completed - day(evt_completed) )+ 1 as date) , 
+count(*) 
+from r5requircodes inner join r5events on rqm_code = evt_reqm
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where rqm_code in (#promptmany('SEL_PROBLEM')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by rqm_desc, cast((evt_completed - day(evt_completed) )+ 1 as date) 
+)d
+
+on mth = ma
+
+where ma  &lt;= convert(date, substring(#prompt('SEL_END')#,1,7)+'-01', 121)</sqlText>
+		<mdProjectedItems><mdProjectedItem name="Code"/><mdProjectedItem name="Month"/><mdProjectedItem name="smonth"/><mdProjectedItem name="WO Cnt"/></mdProjectedItems></sqlQuery></source><selection><dataItem name="Code"><expression>[SQL1].[Code]</expression></dataItem><dataItem name="Month"><expression>[SQL1].[Month]</expression></dataItem><dataItem name="smonth"><expression>[SQL1].[smonth]</expression></dataItem><dataItem name="WO Cnt" rollupAggregate="summarize"><expression>[SQL1].[WO Cnt]</expression></dataItem></selection></query><query name="monthly chart">
+			<source>
+				
+			<sqlQuery name="SQL2" dataSource="AdvRepData">
+			<sqlText>select acc_desc "Code",
+substring(datename(month, ma),1,3) + ' '+ datename(year, ma) "Month", 
+ma "smonth",
+wcnt "WO Cnt"
+
+from 
+
+(select convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)  ma from dual
+union select dateadd(month, 1,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 2,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 3,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 4,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 5,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 6,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 7,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 8,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 9,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 10,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual
+union select dateadd(month, 11,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121)) from dual) a
+
+left outer join
+
+(select acc_desc, 
+cast((evt_completed - day(evt_completed) )+ 1 as date) mth, 
+count(*) wcnt
+from r5actioncodes inner join r5events on acc_code = evt_action
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where  acc_code in (#promptmany('SEL_ACTION')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by acc_desc, cast((evt_completed - day(evt_completed) )+ 1 as date) 
+
+union
+select cau_desc , 
+cast((evt_completed - day(evt_completed) )+ 1 as date), 
+count(*)
+from r5causes inner join r5events on cau_code = evt_cause
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where cau_code in (#promptmany('SEL_CAUSE')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by cau_desc, cast((evt_completed - day(evt_completed) )+ 1 as date)
+
+union
+select fal_desc, 
+cast((evt_completed - day(evt_completed) )+ 1 as date),
+count(*) 
+from r5failures inner join r5events on fal_code = evt_failure
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where  fal_code in (#promptmany('SEL_FAILURE')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by fal_desc, cast((evt_completed - day(evt_completed) )+ 1 as date)
+
+union
+select rqm_desc ,
+cast((evt_completed - day(evt_completed) )+ 1 as date) , 
+count(*) 
+from r5requircodes inner join r5events on rqm_code = evt_reqm
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where rqm_code in (#promptmany('SEL_PROBLEM')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by rqm_desc, cast((evt_completed - day(evt_completed) )+ 1 as date) 
+)d
+
+on mth = ma
+
+where ma  &lt;= convert(date, substring(#prompt('SEL_END')#,1,7)+'-01', 121)</sqlText>
+		<mdProjectedItems><mdProjectedItem name="Code"/><mdProjectedItem name="Month"/><mdProjectedItem name="smonth"/><mdProjectedItem name="WO Cnt"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="Code"><expression>[SQL2].[Code]</expression></dataItem><dataItem name="Month"><expression>[SQL2].[Month]</expression></dataItem><dataItem name="smonth"><expression>[SQL2].[smonth]</expression></dataItem><dataItem name="WO Cnt" rollupAggregate="summarize"><expression>[SQL2].[WO Cnt]</expression></dataItem></selection>
+		</query><query name="annual xtab">
+			<source>
+				
+			<sqlQuery name="SQL3" dataSource="AdvRepData">
+			<sqlText>select acc_desc "Code",
+cast(ma as nvarchar) "Year", 
+wcnt "WO Cnt"
+
+from 
+
+(select year(convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121) ) ma from dual
+union select year(dateadd(month, 12,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 24,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 36,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 48,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 60,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 72,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 84,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 96,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 108,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+) a
+
+left outer join
+
+(select acc_desc, 
+year(cast((evt_completed - day(evt_completed) )+ 1 as date)) mth, 
+count(*) wcnt
+from r5actioncodes inner join r5events on acc_code = evt_action
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where  acc_code in (#promptmany('SEL_ACTION')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by acc_desc, year(cast((evt_completed - day(evt_completed) )+ 1 as date)) 
+
+union
+select cau_desc , 
+year(cast((evt_completed - day(evt_completed) )+ 1 as date)), 
+count(*)
+from r5causes inner join r5events on cau_code = evt_cause
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where cau_code in (#promptmany('SEL_CAUSE')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by cau_desc, year(cast((evt_completed - day(evt_completed) )+ 1 as date))
+
+union
+select fal_desc, 
+year(cast((evt_completed - day(evt_completed) )+ 1 as date)),
+count(*) 
+from r5failures inner join r5events on fal_code = evt_failure
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where  fal_code in (#promptmany('SEL_FAILURE')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by fal_desc, year(cast((evt_completed - day(evt_completed) )+ 1 as date))
+
+union
+select rqm_desc ,
+year(cast((evt_completed - day(evt_completed) )+ 1 as date)), 
+count(*) 
+from r5requircodes inner join r5events on rqm_code = evt_reqm
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where rqm_code in (#promptmany('SEL_PROBLEM')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by rqm_desc, year(cast((evt_completed - day(evt_completed) )+ 1 as date)) 
+)d
+
+on mth = ma
+
+where ma  &lt;= year(convert(date, substring(#prompt('SEL_END')#,1,7)+'-01', 121))</sqlText>
+		<mdProjectedItems><mdProjectedItem name="Code"/><mdProjectedItem name="Year"/><mdProjectedItem name="WO Cnt"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="Code"><expression>[SQL3].[Code]</expression></dataItem><dataItem name="Year"><expression>[SQL3].[Year]</expression></dataItem><dataItem name="WO Cnt" rollupAggregate="summarize"><expression>[SQL3].[WO Cnt]</expression></dataItem></selection>
+		</query><query name="annual chart">
+			<source>
+				
+			<sqlQuery name="SQL3" dataSource="AdvRepData">
+			<sqlText>select acc_desc "Code",
+cast(ma as nvarchar) "Year", 
+wcnt "WO Cnt"
+
+from 
+
+(select year(convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121) ) ma from dual
+union select year(dateadd(month, 12,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 24,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 36,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 48,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 60,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 72,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 84,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 96,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+union select year(dateadd(month, 108,convert(date, substring(#prompt('SEL_START')#,1,7)+'-01', 121))) from dual
+) a
+
+left outer join
+
+(select acc_desc, 
+year(cast((evt_completed - day(evt_completed) )+ 1 as date)) mth, 
+count(*) wcnt
+from r5actioncodes inner join r5events on acc_code = evt_action
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where  acc_code in (#promptmany('SEL_ACTION')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by acc_desc, year(cast((evt_completed - day(evt_completed) )+ 1 as date)) 
+
+union
+select cau_desc , 
+year(cast((evt_completed - day(evt_completed) )+ 1 as date)), 
+count(*)
+from r5causes inner join r5events on cau_code = evt_cause
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where cau_code in (#promptmany('SEL_CAUSE')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by cau_desc, year(cast((evt_completed - day(evt_completed) )+ 1 as date))
+
+union
+select fal_desc, 
+year(cast((evt_completed - day(evt_completed) )+ 1 as date)),
+count(*) 
+from r5failures inner join r5events on fal_code = evt_failure
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where  fal_code in (#promptmany('SEL_FAILURE')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by fal_desc, year(cast((evt_completed - day(evt_completed) )+ 1 as date))
+
+union
+select rqm_desc ,
+year(cast((evt_completed - day(evt_completed) )+ 1 as date)), 
+count(*) 
+from r5requircodes inner join r5events on rqm_code = evt_reqm
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where rqm_code in (#promptmany('SEL_PROBLEM')#) 
+and dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+group by rqm_desc, year(cast((evt_completed - day(evt_completed) )+ 1 as date)) 
+)d
+
+on mth = ma
+
+where ma  &lt;= year(convert(date, substring(#prompt('SEL_END')#,1,7)+'-01', 121))</sqlText>
+		<mdProjectedItems><mdProjectedItem name="Code"/><mdProjectedItem name="Year"/><mdProjectedItem name="WO Cnt"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="Code"><expression>[SQL3].[Code]</expression></dataItem><dataItem name="Year"><expression>[SQL3].[Year]</expression></dataItem><dataItem name="WO Cnt" rollupAggregate="summarize"><expression>[SQL3].[WO Cnt]</expression></dataItem></selection>
+		</query><query name="org lov">
+			<source>
+				
+			<sqlQuery name="SQL4" dataSource="AdvRepData">
+			<sqlText>select org_code from r5organization</sqlText>
+		<mdProjectedItems><mdProjectedItem name="ORG_CODE"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="ORG_CODE" sort="ascending"><expression>[SQL4].[ORG_CODE]</expression></dataItem></selection>
+		</query><query name="mrc lov">
+			<source>
+				
+			<sqlQuery name="SQL5" dataSource="AdvRepData">
+			<sqlText>select mrc_desc, mrc_code from r5mrcs 
+where  'All' in (#promptmany('SEL_ORG')#)  or mrc_org in (#promptmany('SEL_ORG')#)</sqlText>
+		<mdProjectedItems><mdProjectedItem name="MRC_DESC"/><mdProjectedItem name="MRC_CODE"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="MRC_DESC" sort="ascending"><expression>[SQL5].[MRC_DESC]</expression></dataItem><dataItem name="MRC_CODE"><expression>[SQL5].[MRC_CODE]</expression></dataItem></selection>
+		</query><query name="class lov">
+			<source>
+				
+			<sqlQuery name="SQL5" dataSource="AdvRepData">
+			<sqlText>select cls_code, cls_desc from r5classes
+where cls_rentity = 'OBJ'</sqlText>
+		<mdProjectedItems><mdProjectedItem name="CLS_CODE"/><mdProjectedItem name="CLS_DESC"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="CLS_CODE"><expression>[SQL5].[CLS_CODE]</expression></dataItem><dataItem name="CLS_DESC" sort="ascending"><expression>[SQL5].[CLS_DESC]</expression></dataItem></selection>
+		</query><query name="jbtp lov">
+			<source>
+				
+			<sqlQuery name="SQL5" dataSource="AdvRepData">
+			<sqlText>select uco_code, uco_desc 
+from r5ucodes 
+where uco_rentity = 'JBTP'</sqlText>
+		<mdProjectedItems><mdProjectedItem name="UCO_CODE"/><mdProjectedItem name="UCO_DESC"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="UCO_CODE"><expression>[SQL5].[UCO_CODE]</expression></dataItem><dataItem name="UCO_DESC" sort="ascending"><expression>[SQL5].[UCO_DESC]</expression></dataItem></selection>
+		</query><query name="problem lov">
+			<source>
+				
+			<sqlQuery name="SQL5" dataSource="AdvRepData">
+			<sqlText>select rqm_code, rqm_desc from r5requircodes
+ inner join r5events on rqm_code = evt_reqm
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where   dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')
+
+
+
+</sqlText>
+		<mdProjectedItems><mdProjectedItem name="rqm_code"/><mdProjectedItem name="rqm_desc"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="rqm_code"><expression>[SQL5].[rqm_code]</expression></dataItem><dataItem name="rqm_desc"><expression>[SQL5].[rqm_desc]</expression></dataItem></selection>
+		</query><query name="cause lov">
+			<source>
+				
+			<sqlQuery name="SQL5" dataSource="AdvRepData">
+			<sqlText>select cau_code, cau_desc from r5causes
+ inner join r5events on cau_code = evt_cause
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where   dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')</sqlText>
+		<mdProjectedItems><mdProjectedItem name="cau_code"/><mdProjectedItem name="cau_desc"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="cau_code"><expression>[SQL5].[cau_code]</expression></dataItem><dataItem name="cau_desc"><expression>[SQL5].[cau_desc]</expression></dataItem></selection>
+		</query><query name="fail lov">
+			<source>
+				
+			<sqlQuery name="SQL5" dataSource="AdvRepData">
+			<sqlText>select fal_code, fal_desc from r5failures
+ inner join r5events on fal_code = evt_failure
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where   dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')</sqlText>
+		<mdProjectedItems><mdProjectedItem name="fal_code"/><mdProjectedItem name="fal_desc"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="fal_code"><expression>[SQL5].[fal_code]</expression></dataItem><dataItem name="fal_desc"><expression>[SQL5].[fal_desc]</expression></dataItem></selection>
+		</query><query name="action lov">
+			<source>
+				
+			<sqlQuery name="SQL5" dataSource="AdvRepData">
+			<sqlText>select acc_code, acc_desc from r5actioncodes
+ inner join r5events on acc_code = evt_action
+inner join r5objects on obj_code = evt_object and obj_org = evt_object_org
+where   dbo.repgetcompdate(evt_completed) between #prompt('SEL_START')# and #prompt('SEL_END')#
+and ( 'All' in (#promptmany('SEL_CLASS')#)  or obj_class in (#promptmany('SEL_CLASS')#) )
+and ( 'All' in (#promptmany('SEL_MRC')#)  or evt_mrc in (#promptmany('SEL_MRC')#) )
+and ( 'All' in (#promptmany('SEL_ORG')#)  or evt_org in (#promptmany('SEL_ORG')#) )
+and ( 'All' in (#promptmany('SEL_JBTP')#)  or evt_jobtype in (#promptmany('SEL_JBTP')#) )
+and evt_type in ('JOB', 'PPM')</sqlText>
+		<mdProjectedItems><mdProjectedItem name="acc_code"/><mdProjectedItem name="acc_desc"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="acc_code"><expression>[SQL5].[acc_code]</expression></dataItem><dataItem name="acc_desc"><expression>[SQL5].[acc_desc]</expression></dataItem></selection>
+		</query><query name="display dates">
+			<source>
+				
+			<sqlQuery name="SQL6" dataSource="AdvRepData">
+			<sqlText>select 
+convert(datetime, #prompt('SEL_START')#, 121)  startdate, 
+convert(datetime, #prompt('SEL_END')#, 121)  enddate
+from dual</sqlText>
+		<mdProjectedItems><mdProjectedItem name="startdate"/><mdProjectedItem name="enddate"/></mdProjectedItems></sqlQuery></source>
+			<selection><dataItem name="startdate"><expression>[SQL6].[startdate]</expression></dataItem><dataItem name="enddate"><expression>[SQL6].[enddate]</expression></dataItem></selection>
+		</query></queries><reportName>CCANAL</reportName><reportVariables><reportVariable type="boolean" name="MONTHLY CROSSTAB">
+			<reportExpression>ParamDisplayValue('SHOW') LIKE '%MONTHLY CROSSTAB%'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable type="boolean" name="MONTHLY CHART">
+			<reportExpression>ParamDisplayValue('SHOW') LIKE '%MONTHLY CHART%'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable type="boolean" name="YEARLY CROSSTAB">
+			<reportExpression>ParamDisplayValue('SHOW') LIKE '%YEARLY CROSSTAB%'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable><reportVariable type="boolean" name="YEARLY CHART">
+			<reportExpression>ParamDisplayValue('SHOW') LIKE '%YEARLY CHART%'</reportExpression>
+			<variableValues>
+				<variableValue value="1"/>
+			</variableValues>
+		</reportVariable></reportVariables></report>

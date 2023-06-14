@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessContentDocument xmlns="http://schema.infor.com/InforOAGIS/2"
+    xmlns:cd="http://schema.infor.com/eam/inforbodmodel/100/contentdocument"
+    xmlns:ed="http://schema.infor.com/eam/model/100/eamdocument" languageCode="en-US" releaseID="9.2" systemEnvironmentCode="Production" versionID="2.12.0">
+    <ApplicationArea>
+        <Sender>
+            <LogicalID>lid://infor.eam.eam</LogicalID>
+            <ComponentID>EAM</ComponentID>
+            <TaskID>Production</TaskID>
+            <ConfirmationCode>OnError</ConfirmationCode>
+        </Sender>
+        <CreationDateTime>2023-02-08T01:51:59.598Z</CreationDateTime>
+        <BODID>infor.eam.eam.infor.Process.ContentDocument.M419834.1</BODID>
+    </ApplicationArea>
+    <DataArea>
+        <Process>
+            <TenantID/>
+            <ActionCriteria>
+                <ActionExpression actionCode="Change"/>
+                <ChangeStatus>
+                    <Code>Updated</Code>
+                    <Description>Updated</Description>
+                    <ReasonCode>00</ReasonCode>
+                    <Reason>Accepted</Reason>
+                </ChangeStatus>
+            </ActionCriteria>
+        </Process>
+        <ContentDocument>
+            <DocumentID>
+                <ID lid="lid://infor.daf.1">EAM-7880-0-LATEST</ID>
+            </DocumentID>
+            <LastModificationDateTime>2023-02-08T12:51:55.650+11:00</LastModificationDateTime>
+            <Version>1</Version>
+            <Status>
+                <Code listID="Content Document Status">Updated</Code>
+            </Status>
+            <DocumentMetaData>
+                <DocumentTypeID>EAM</DocumentTypeID>
+                <Attribute id="documentid">
+                    <AttributeType listID="Attribute Data Types">String</AttributeType>
+                    <AttributeValue>54775</AttributeValue>
+                </Attribute>
+            </DocumentMetaData>
+        </ContentDocument>
+    </DataArea>
+</ProcessContentDocument>

@@ -1,0 +1,42 @@
+****************************
+A.L.
+Send email to Change Approval Owner
+****************************
+
+DECLARE
+@email nvarchar(255),
+@wonum nvarchar(8),
+@wodesc nvarchar(80),
+@owner nvarchar(10),
+@creator nvarchar(10), 
+@snew   nvarchar(4),
+@type   nvarchar(8),
+@sold   nvarchar(4);
+
+BEGIN
+  SELECT @sold=evt_udfchar06, @snew=evt_status, @wonum = evt_code, @wodesc = evt_desc, @owner = EVT_SCHEDGRP, @type=evt_jobtype, @creator = EVT_ENTEREDBY FROM r5events WHERE evt_sqlidentity=:rowid;
+
+IF(@sold='CHWA' AND @snew = 'PLAN')
+BEGIN
+IF @owner = 'AM' SET @email = 'SBAHUTH'
+IF @owner = 'EI' SET @email = 'DFRISWELL'
+IF @owner = 'HSEQ' SET @email = 'ACOCHRANE'
+IF @owner = 'ICT' SET @email = 'CRODRIGUEZ'
+IF @owner = 'MECH' SET @email = 'RKOCH'
+IF @owner = 'OPS' SET @email = 'JTAUVREY'
+IF @owner = 'PLAN' SET @email = 'NULL'
+IF @owner = 'PLANTOPS' SET @email = 'MLAGUITTON'
+IF @owner = 'PROJ' SET @email = 'SSLATTERY'
+IF @owner = 'PROSUPP' SET @email = 'KHARRIS'
+IF @owner = 'SITEOPS' SET @email = 'PRAYNER'
+ELSE SET @email = @owner
+
+BEGIN 
+INSERT INTO R5MAILEVENTS 
+(MAE_TEMPLATE, MAE_DATE, MAE_SEND, MAE_RSTATUS, MAE_PARAM1, MAE_PARAM2, 
+MAE_PARAM3,MAE_PARAM4, MAE_PARAM5, MAE_PARAM6, MAE_PARAM7, MAE_PARAM8,
+MAE_PARAM9, MAE_PARAM10, MAE_PARAM11)
+VALUES ('CHOWNER2',GETDATE(),'-','N',@wonum,@wodesc,@creator,@email, null, null, null, null, null, null, null);             
+END
+END
+END

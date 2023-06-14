@@ -1,0 +1,1 @@
+select parent + N'#' + parent_org FROM	O7CREOB1_GET_HIERARCHY_1( @sObrtype, @sObcode, @sObcodeorg ) )) 
