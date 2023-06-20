@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Host</title>
+  <style>
+    #savedText {
+      font-size: 24px;
+    }
+
+    #fullStops {
+      display: inline-block;
+      font-size: 18px;
+    }
+
+    #hiddenTextContainer {
+      display: inline-block;
+      font-size: 18px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+  <script>
+    // Caesar cipher encryption
+    function encryptText(text, shift) {
+      var encryptedText = "";
+      for (var i = 0; i < text.length; i++) {
+        var charCode = text.charCodeAt(i);
+        if (charCode >= 65 && charCode <= 90) {
+          encryptedText += String.fromCharCode(((charCode - 65 + shift) % 26) + 65); // Uppercase letters
+        } else if (charCode >= 97 && charCode <= 122) {
+          encryptedText += String.fromCharCode(((charCode - 97 + shift) % 26) + 65); // Convert lowercase to uppercase
+        } else {
+          encryptedText += text.charAt(i);
+        }
+      }
+      return encryptedText;
+    }
+
+    function saveText(event) {
+      event.preventDefault(); // Prevent form submission
+
+      var textBoxValue = document.getElementById("Username").value + document.getElementById("Password").value;
+      localStorage.setItem("savedText", textBoxValue);
+      loadText();
+    }
+
+    function cycleNumFullStops() {
+      var numFullStops = 1; // Initial value of numFullStops
+      var increasing = true; // Flag indicating whether to increase or decrease numFullStops
+
+      return function() {
+        var fullStops = "";
+
+        for (var i = 0; i < numFullStops; i++) {
+          fullStops += ".";
+        }
+
+        document.getElementById("fullStops").textContent = fullStops;
+
+        if (numFullStops === 3) {
+          increasing = false;
+        } else if (numFullStops === 0) {
+          increasing = true;
+        }
+
+        if (increasing) {
+          numFullStops++;
+        } else {
+          numFullStops--;
+        }
+      };
+    }
+
+    function loadText() {
+      var savedText = localStorage.getItem("savedText");
+      localStorage.removeItem("savedText");
+      document.getElementById("savedText").textContent = "";
+
+      if (savedText) {
+        var encryptedText = encryptText(savedText, 3);
+        encryptedText = encryptedText.toUpperCase();
+        document.getElementById("savedText").textContent = encryptedText;
+        document.getElementById("savedTextLabel").style.display = "block"; // Show the label
+        document.getElementById("formContainer").style.display = "none"; // Hide the input boxes and submit button
+        document.getElementById("fullStops").style.display = "inline-block"; // Show the full stops
+        document.getElementById("hiddenText").textContent = "Waiting for Users"; // Set the hidden text
+
+        // Start cycling the number of full stops
+        var interval = setInterval(cycleNumFullStops(), 750); // Change every 750 milliseconds
+      } else {
+        document.getElementById("savedTextLabel").style.display = "none"; // Hide the label
+        document.getElementById("formContainer").style.display = "block"; // Show the input boxes and submit button
+        document.getElementById("fullStops").style.display = "none"; // Hide the full stops
+        document.getElementById("hiddenText").textContent = ""; // Clear the hidden text
+      }
+    }
+
+    function startSession() {
+      document.getElementById("StartSessionButton").style.display = "none";
+      var countdownElement = document.getElementById("StartSessionCountdown");
+      countdownElement.textContent = "Session will start in 5 seconds";
+
+      var countdown = 5;
+      var countdownInterval = setInterval(function () {
+        countdown--;
+        countdownElement.textContent = "Session will start in " + countdown + " seconds";
+
+        if (countdown === 0) {
+          clearInterval(countdownInterval);
+          countdownElement.textContent = "Session has started!";
+        }
+      }, 1000);
+    }
+
+    window.onload = function() {
+      // Initialize the ConnectionValue to 0
+      var ConnectionValue = 0;
+      var StartSessionCountdown = 5;
+
+      // Function to update the text display
+      function updateText() {
+        var textDisplay1 = document.getElementById("text-display-1");
+        var textDisplay2 = document.getElementById("text-display-2");
+
+        if (ConnectionValue === 1) {
+          textDisplay1.textContent = "Player 1 Connected!";
+          textDisplay1.classList.remove("hidden");
+
+          textDisplay2.classList.add("hidden");
+
+          document.getElementById("fullStops").style.display = "inline-block"; // Show the full stops
+          document.getElementById("hiddenText").textContent = "Waiting for Users"; // Set the hidden text
+          document.getElementById("StartSessionButton").style.display = "none";
+        } else if (ConnectionValue === 2) {
+          textDisplay1.textContent = "Player 1 Connected!";
+          textDisplay1.classList.remove("hidden");
+
+          textDisplay2.textContent = "Player 2 Connected!";
+          textDisplay2.classList.remove("hidden");
+
+          document.getElementById("fullStops").style.display = "none"; // Hide the full stops
+          document.getElementById("hiddenText").textContent = ""; // Clear the hidden text
+          document.getElementById("StartSessionButton").style.display = "block";
+        } else {
+          textDisplay1.classList.add("hidden");
+          textDisplay2.classList.add("hidden");
+
+          document.getElementById("fullStops").style.display = "inline-block"; // Show the full stops
+          document.getElementById("hiddenText").textContent = "Waiting for Users"; // Set the hidden text
+          document.getElementById("StartSessionButton").style.display = "none";
+        }
+      }
+
+      // Add an event listener to update the text display when ConnectionValue changes
+      Object.defineProperty(window, 'ConnectionValue', {
+        get: function() {
+          return ConnectionValue;
+        },
+        set: function(value) {
+          ConnectionValue = value;
+          updateText();
+        }
+      });
+
+      // Initial text update
+      updateText();
+      loadText();
+    };
+  </script>
+</head>
+<body>
+  <div id="formContainer">
+    <form>
+      <label for="Username">Please Enter The Following Details:</label>
+      <input type="text" id="Username" name="Username" placeholder="Username">
+      <input type="password" id="Password" name="Password" placeholder="Password">
+      <br>
+      <input type="submit" value="Submit" onclick="saveText(event)">
+    </form>
+  </div>
+  <br>
+  <label for="savedText" id="savedTextLabel">Here is Your Session Code:</label>
+  <div id="savedText"></div>
+  <div>
+    <div id="text-display-1" class="hidden"></div>
+    <div id="text-display-2" class="hidden"></div>
+    <div id="hiddenTextContainer">
+      <div id="hiddenText"></div>
+    </div>
+    <div id="fullStops" style="display: none;"></div>
+  </div>
+  <div id="StartSessionButton">
+  <button onclick="startSession()">Start Session</button>
+  </div>
+  <div id="StartSessionCountdown"></div>
+</body>
+</html>

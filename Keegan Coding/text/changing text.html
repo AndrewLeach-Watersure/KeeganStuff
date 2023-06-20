@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Display Text Example</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            // Initialize the ConnectionValue to 0
+            var ConnectionValue = 0;
+            
+            // Function to update the text display
+            function updateText() {
+                var textDisplay1 = document.getElementById("text-display-1");
+                var textDisplay2 = document.getElementById("text-display-2");
+                
+                if (ConnectionValue === 1) {
+                    textDisplay1.textContent = "Player 1 Connected!";
+                    textDisplay1.classList.remove("hidden");
+                    
+                    textDisplay2.classList.add("hidden");
+                } else if (ConnectionValue === 2) {
+                    textDisplay1.textContent = "Player 1 Connected!";
+                    textDisplay1.classList.remove("hidden");
+                    
+                    textDisplay2.textContent = "Player 2 Connected!";
+                    textDisplay2.classList.remove("hidden");
+                } else {
+                    textDisplay1.classList.add("hidden");
+                    textDisplay2.classList.add("hidden");
+                }
+            }
+            
+            // Add an event listener to update the text display when ConnectionValue changes
+            Object.defineProperty(window, 'ConnectionValue', {
+                get: function() {
+                    return ConnectionValue;
+                },
+                set: function(value) {
+                    ConnectionValue = value;
+                    updateText();
+                }
+            });
+            
+            // Initial text update
+            updateText();
+        }
+    </script>
+</head>
+<body>
+    <div id="text-display-1" class="hidden"></div>
+    <div id="text-display-2" class="hidden"></div>
+</body>
+</html>

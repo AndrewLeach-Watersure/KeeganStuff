@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Text Box Example</title>
+  <style>
+    #savedText {
+      font-size: 24px;
+    }
+  </style>
+  <script>
+    function saveText() {
+      var textBoxValue = document.getElementById("textbox").value;
+      localStorage.setItem("savedText", textBoxValue);
+    }
+
+    function loadText() {
+      var savedText = localStorage.getItem("savedText");
+      if (savedText) {
+        document.getElementById("savedText").textContent = savedText;
+      }
+    }
+  </script>
+</head>
+<body onload="loadText()">
+  <form>
+    <label for="textbox">Enter your text:</label>
+    <input type="text" id="textbox" name="textbox" placeholder="Type something...">
+    <br>
+    <input type="submit" value="Submit" onclick="saveText()">
+  </form>
+  <div id="savedText"></div>
+</body>
+</html>
