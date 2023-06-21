@@ -29,6 +29,13 @@
              height: 20px; /* Adjust the height of the bars */
              background-color: #ccc; /* Adjust the background color of the bars */
              border: 5px solid black; /* Add a thicker black border */
+             position: relative;
+        }
+        #freeze-image {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
         }
         #health-bar, #cold-bar {
             height: 100%;
@@ -37,7 +44,7 @@
             background-color: green; /* Adjust the background color of the health bar */
         }
         #cold-bar {
-            background-color: blue; /* Adjust the background color of the cold bar */
+            background-color: rgb(131, 131, 255); /* Adjust the background color of the cold bar */
         }
         #heart-image {
             position: absolute;
@@ -57,6 +64,7 @@
         </div>
         <div id="cold-bar-container">
             <div id="cold-bar"></div>
+            <img id="freeze-image" src="freeze.png" alt="Freeze">
         </div>
     </div>
 
@@ -75,6 +83,19 @@
         var jumpDelay = false;
         var health = 100; // Initial health value
         var cold = 0; // Initial cold value
+
+        setInterval(function () {
+            cold += 1;
+            cold = Math.min(cold, 100); // Ensure cold value doesn't exceed 100
+        }, 5000);
+
+        setInterval(function () {
+            if (cold === 100 && health > 0) {
+                health -= 1;
+                health = Math.max(health, 0); // Ensure health value doesn't go below 0
+            }
+        }, 1000);
+
 
         window.addEventListener("keydown", function (event) {
             keysPressed[event.key] = true;
