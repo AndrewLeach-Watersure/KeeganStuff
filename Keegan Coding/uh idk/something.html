@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cryophobia</title>
+    <style>
+        #game-container {
+            position: relative;
+        }
+        #arrow-image, #obstacle-image, #health-bar-container, #cold-bar-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #obstacle-image {
+            top: 700px; /* Adjust the value to position the floor image lower */
+        }
+        #health-bar-container {
+            top: 10px; /* Adjust the value to position the bars vertically */
+            left: 10px; /* Adjust the value to position the bars horizontally */
+            width: 200px; /* Adjust the width of the bars */
+            height: 20px; /* Adjust the height of the bars */
+            background-color: #ccc; /* Adjust the background color of the bars */
+            border: 5px solid black; /* Add a thicker black border */
+        }
+        #cold-bar-container {
+             top: 60px; /* Adjust the value to move the cold bar lower */
+             left: 10px; /* Adjust the value to position the bars horizontally */
+             width: 200px; /* Adjust the width of the bars */
+             height: 20px; /* Adjust the height of the bars */
+             background-color: #ccc; /* Adjust the background color of the bars */
+             border: 5px solid black; /* Add a thicker black border */
+        }
+        #health-bar, #cold-bar {
+            height: 100%;
+        }
+        #health-bar {
+            background-color: green; /* Adjust the background color of the health bar */
+        }
+        #cold-bar {
+            background-color: blue; /* Adjust the background color of the cold bar */
+        }
+        #heart-image {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <img id="arrow-image" src="guy.png" alt="Image Description">
+        <img id="obstacle-image" src="floor.png" alt="Obstacle">
+        <div id="health-bar-container">
+            <div id="health-bar"></div>
+            <img id="heart-image" src="heart.png" alt="Heart">
+        </div>
+        <div id="cold-bar-container">
+            <div id="cold-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        var arrowImg = document.getElementById("arrow-image");
+        var obstacleImg = document.getElementById("obstacle-image");
+        var healthBar = document.getElementById("health-bar");
+        var coldBar = document.getElementById("cold-bar");
+        var arrowPositionX = 0;
+        var arrowPositionY = 0;
+        var stepSize = 10;
+        var jumpStrength = 100;
+        var gravity = 9.8;
+        var keysPressed = {};
+        var isOnGround = false;
+        var jumpDelay = false;
+        var health = 100; // Initial health value
+        var cold = 0; // Initial cold value
+
+        window.addEventListener("keydown", function (event) {
+            keysPressed[event.key] = true;
+        });
+
+        window.addEventListener("keyup", function (event) {
+            keysPressed[event.key] = false;
+        });
+
+        function moveArrow() {
+            // Apply gravity only if not on the ground and not in jump delay
+            if (!isOnGround && !jumpDelay) {
+                arrowPositionY += gravity;
+            }
+
+            // Handle arrow key movements if health is not 0
+            if (health > 0) {
+                if (keysPressed["ArrowUp"] && isOnGround) {
+                    arrowPositionY -= jumpStrength;
+                    isOnGround = false;
+                    jumpDelay = true;
+                    setTimeout(function () {
+                        jumpDelay = false;
+                    }, 200); // Adjust the delay time as desired
+                }
+                if (keysPressed["ArrowDown"]) {
+                    if (!checkCollision(arrowPositionX, arrowPositionY + stepSize)) {
+                        arrowPositionY += stepSize;
+                    }
+                }
+                if (keysPressed["ArrowLeft"]) {
+                    if (!checkCollision(arrowPositionX - stepSize, arrowPositionY)) {
+                        arrowPositionX -= stepSize;
+                    }
+                }
+                if (keysPressed["ArrowRight"]) {
+                    if (!checkCollision(arrowPositionX + stepSize, arrowPositionY)) {
+                        arrowPositionX += stepSize;
+                    }
+                }
+            }
+
+            // Collision detection with obstacle (floor.png)
+            if (arrowPositionY + arrowImg.offsetHeight >= obstacleImg.offsetTop) {
+                arrowPositionY = obstacleImg.offsetTop - arrowImg.offsetHeight;
+                isOnGround = true;
+            }
+
+            arrowImg.style.top = arrowPositionY + "px";
+            arrowImg.style.left = arrowPositionX + "px";
+
+            // Update health bar
+            healthBar.style.width = health + "%";
+
+            // Update cold bar
+            coldBar.style.width = cold + "%";
+
+            // Check if health is 0
+            if (health === 0) {
+                arrowImg.src = "dead.png";
+                keysPressed = {}; // Clear key presses to prevent movement
+            }
+
+            requestAnimationFrame(moveArrow);
+        }
+
+        function checkCollision(x, y) {
+            var arrowRect = arrowImg.getBoundingClientRect();
+            var obstacleRect = obstacleImg.getBoundingClientRect();
+
+            return (
+                x < obstacleRect.right &&
+                x + arrowRect.width > obstacleRect.left &&
+                y < obstacleRect.bottom &&
+                y + arrowRect.height > obstacleRect.top
+            );
+        }
+
+        moveArrow();
+    </script>
+</body>
+</html>
